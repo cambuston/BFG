@@ -1,0 +1,185 @@
+/* Piezas de la página pública (flecos.mx/juan). Lo demás —fondo, calendario,
+   hero, botones, tipografía— viene tal cual de Días que Cuentan. */
+
+/* ---------- Lista de precios de la portada ---------- */
+.precios {
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+}
+
+.precio-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 7px 2px;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 300;
+}
+
+.precio-row + .precio-row { border-top: 1px solid rgba(255, 255, 255, 0.16); }
+
+/* Los puntitos que llevan del nombre al precio, como en una carta. */
+.precio-nombre {
+  flex: 1 1 auto;
+  min-width: 0;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+.precio-valor {
+  flex: 0 0 auto;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* ---------- Elegir servicio ---------- */
+.servicio-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-height: 62px;
+  margin: 0 0 10px;
+  padding: 12px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.15s ease;
+}
+
+.servicio-btn:active { transform: scale(0.97); background: rgba(255, 255, 255, 0.2); }
+
+.servicio-txt { display: flex; flex-direction: column; min-width: 0; line-height: 1.25; }
+.servicio-nombre { font-size: 1.05rem; font-weight: 400; overflow-wrap: anywhere; }
+.servicio-min { font-size: 0.82rem; font-weight: 300; opacity: 0.75; }
+.servicio-precio { flex: 0 0 auto; font-size: 1.05rem; font-weight: 500; }
+
+/* ---------- Elegir día y hora ---------- */
+.elegido {
+  margin: -8px 0 14px;
+  color: #fff;
+  font-size: 0.98rem;
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+.dia { margin-bottom: 16px; }
+
+/* Solo la PRIMERA letra en mayúscula. `text-transform: capitalize` ponía
+   "Lunes 10 De Agosto" — con "De" en mayúscula, que en español está mal. */
+.dia-titulo::first-letter { text-transform: uppercase; }
+
+.dia-titulo {
+  margin: 0 0 8px;
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 400;
+  text-align: left;
+  opacity: 0.85;
+}
+
+.horas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Las horas son fichas, no una lista: se ven todas de un golpe y se tocan
+   fácil con el pulgar. */
+.hora-btn {
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 400;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.15s ease;
+}
+
+.hora-btn:active { transform: scale(0.94); background: #fff; color: var(--brand-blue); }
+
+.cargando {
+  margin: 8px 0;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.95rem;
+  font-weight: 300;
+}
+
+/* ---------- Ya soy cliente ---------- */
+.saludo {
+  margin: 16px 0 12px;
+  color: #fff;
+  font-size: 1.15rem;
+  font-weight: 400;
+}
+
+/* Los campos de nombre y celular son los del calendario de Días que Cuentan;
+   solo se separan un poco entre ellos. */
+.calendar-dialog [data-step="3"] input,
+.calendar-dialog [data-step="5"] input { margin-bottom: 10px; }
+
+/* "+ 6 horas más": el resto del día, para quien no encontró la suya. */
+.ver-mas {
+  display: block;
+  margin: 10px auto 0;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 300;
+  cursor: pointer;
+}
+.ver-mas:active { background: rgba(255, 255, 255, 0.26); }
+
+/* El nombre del negocio lo escribe cada quien y varía mucho más que "Días que
+   Cuentan": el clamp evita que "Peluquería y Estética Lupita" se salga de la
+   columna del header partido. */
+.hero h1 {
+  font-size: clamp(1.05rem, 5.2vw, 1.42rem);
+  overflow-wrap: anywhere;
+}
+
+/* Días que Cuentan estiliza input[type=text] y [date], pero no [tel] — allá
+   no había campos de teléfono. Sin esto, "Tu celular" salía como un input
+   pelón del navegador junto a los demás ya redondeados.
+   (La regla vive aquí y no en styles.css: esa hoja es copia literal y no se
+   toca — ver CLAUDE.md.) */
+.calendar-dialog input[type="tel"] {
+  width: 100%;
+  font-family: inherit;
+  font-size: 1.15rem;
+  padding: 16px;
+  border: 2px solid #DCE8FF;
+  border-radius: 16px;
+  background: #F7FAFF;
+  color: var(--text);
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  min-height: 58px;
+}
+
+.calendar-dialog input[type="tel"]:focus { border-color: var(--secondary); background: #fff; }
+
+/* .share-box viene con `word-break: break-all` porque allá guardaba una liga.
+   Aquí lleva una frase ("lunes 10 de agosto…") y partía las palabras a la
+   mitad: "de ag / osto". */
+.calendar-dialog .share-box {
+  word-break: normal;
+  overflow-wrap: anywhere;
+}

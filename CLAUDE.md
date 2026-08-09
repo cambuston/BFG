@@ -58,7 +58,19 @@ Aun en modo autónomo, sí hay que detenerse en dos casos:
 
 ## Lo que sigue
 
-El alta son dos pasos y nada más. Falta todo lo demás de Flecos 1.0: la página
-pública del profesional, reservar cita, la ficha del cliente, los regresos y
-«mi negocio». El plan completo está en [ideas.txt](ideas.txt) — ese archivo son
-las notas originales de producto, no lo borres.
+**Flecos 1.0 está completo**: el alta, la página pública, reservar cita, «Hoy»,
+la ficha del cliente con sus notas, los regresos y «mi negocio». El README dice
+qué hace cada parte y qué quedó fuera a propósito.
+
+Lo que falta, en orden de lo que más se va a pedir:
+
+1. **Recordatorios automáticos.** Hoy Regresos enseña a quién le toca y da el
+   botón de WhatsApp, pero el mensaje lo manda Juan a mano. Es la promesa de
+   «Flecos hace que regresen» y todavía la cumple una persona.
+2. **Cancelar o mover una cita desde el lado del cliente.** El API ya cambia el
+   estado; falta la pantalla y avisarle al profesional.
+3. **Supabase de verdad.** El código está y probado contra un Supabase falso,
+   pero nadie ha configurado un proyecto real.
+
+El plan original está en [ideas.txt](ideas.txt) — esas son las notas de
+producto de Luis, no lo borres.

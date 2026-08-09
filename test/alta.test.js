@@ -1,6 +1,6 @@
 // El alta completa, por HTTP, contra una base de datos de usar y tirar.
 //
-// El entorno se fija ANTES del require: server.js y handles.db.js lo leen al
+// El entorno se fija ANTES del require: server.js y db.js lo leen al
 // cargarse. node --test corre cada archivo en su propio proceso, así que esto
 // no toca ni tu base de desarrollo ni los demás archivos de prueba.
 const os = require('node:os');

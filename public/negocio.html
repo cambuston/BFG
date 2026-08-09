@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>{{TITULO}}</title>
+  <meta name="theme-color" content="{{BRAND_COLOR}}">
+  <meta name="description" content="Haz tu cita con {{NEGOCIO}}.">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+
+  <!-- Mismas hojas que el alta, en el mismo orden. -->
+  <link rel="stylesheet" href="/fonts/fonts.css?v=1">
+  <link rel="stylesheet" href="/fontawesome/css/all.min.css?v=2">
+  <link rel="stylesheet" href="/styles.css?v=1">
+  <link rel="stylesheet" href="/header-split.css?v=1">
+  <link rel="stylesheet" href="/calendar-form.css?v=1">
+  <link rel="stylesheet" href="/calendar-colors.css?v=1">
+  <link rel="stylesheet" href="/handle.css?v=1">
+  <link rel="stylesheet" href="/negocio.css?v=1">
+
+  <style>
+    :root {
+      --brand-blue: {{BRAND_COLOR}};
+      --primary: {{BRAND_COLOR}};
+      --secondary: {{BRAND_COLOR}};
+    }
+  </style>
+  <script>
+    window.BRAND = {{BRAND_JSON}};
+    window.HANDLE = "{{HANDLE}}";
+  </script>
+</head>
+<body>
+  <div class="container">
+
+    <div class="hero">
+      <svg class="logo" viewBox="0 0 72 72" aria-hidden="true">
+        <rect width="72" height="72" rx="20" fill="#fff"/>
+        <g fill="none" stroke="var(--brand-blue)" stroke-width="4"
+           stroke-linecap="round" stroke-linejoin="round">
+          <path d="M24 20 L48 50"/>
+          <path d="M48 20 L24 50"/>
+          <circle cx="22" cy="54" r="6"/>
+          <circle cx="50" cy="54" r="6"/>
+        </g>
+      </svg>
+      <h1>{{NEGOCIO}}</h1>
+      <p class="subtitle" id="sub"></p>
+    </div>
+
+    <div class="card center calendar-dialog">
+      <div class="calendar-top"></div>
+
+      <div class="calendar-mid">
+        <div class="calendar-content">
+          <div class="steps" id="steps">
+
+            <!-- ===== PORTADA ===== -->
+            <section class="step" data-step="0">
+              <p class="step-prompt">¿Qué necesitas?</p>
+
+              <ul class="precios" id="precios"></ul>
+
+              <button type="button" class="welcome-option" id="ir-cita">
+                <i class="fa-light fa-calendar-plus"></i> <span>Hacer cita</span>
+              </button>
+              <button type="button" class="welcome-option" id="ir-soy">
+                <i class="fa-light fa-rotate-left"></i> <span>Ya soy cliente</span>
+              </button>
+              <a class="welcome-option" id="ir-wa" hidden>
+                <i class="fa-brands fa-whatsapp"></i> <span>Escribir por WhatsApp</span>
+              </a>
+
+              <p class="handle-note" id="horario-nota"></p>
+            </section>
+
+            <!-- ===== 1 · ¿QUÉ QUIERES? ===== -->
+            <section class="step" data-step="1" hidden>
+              <p class="step-prompt">¿Qué te haces?</p>
+              <div id="servicios"></div>
+              <button type="button" class="handle-back" data-volver="0">
+                <i class="fa-light fa-chevron-left"></i> Regresar
+              </button>
+            </section>
+
+            <!-- ===== 2 · ¿CUÁNDO? ===== -->
+            <section class="step" data-step="2" hidden>
+              <p class="step-prompt">¿Cuándo te viene bien?</p>
+              <p class="elegido" id="elegido-servicio"></p>
+              <div id="dias"></div>
+              <button type="button" class="handle-back" data-volver="1">
+                <i class="fa-light fa-chevron-left"></i> Otro servicio
+              </button>
+            </section>
+
+            <!-- ===== 3 · ¿QUIÉN ERES? ===== -->
+            <section class="step" data-step="3" hidden>
+              <p class="step-prompt">¿Quién eres?</p>
+              <p class="elegido" id="elegido-cita"></p>
+
+              <input type="text" id="nombre" placeholder="Tu nombre" maxlength="80"
+                     autocomplete="name" enterkeyhint="next">
+              <input type="tel" id="telefono" placeholder="Tu celular" maxlength="20"
+                     autocomplete="tel" inputmode="tel" enterkeyhint="go">
+              <p class="handle-note">Tu celular es para avisarte si algo cambia.</p>
+
+              <button type="button" class="btn-primary" id="confirmar">Confirmar mi cita</button>
+              <button type="button" class="handle-back" data-volver="2">
+                <i class="fa-light fa-chevron-left"></i> Otra hora
+              </button>
+            </section>
+
+            <!-- ===== 4 · LISTO ===== -->
+            <section class="step" data-step="4" hidden>
+              <p class="big-emoji">✂️</p>
+              <p class="step-prompt" id="listo-titulo">¡Cita hecha!</p>
+              <div class="share-box" id="listo-cita"></div>
+              <p class="handle-note" id="listo-nota"></p>
+              <button type="button" class="handle-back" data-volver="0">
+                <i class="fa-light fa-chevron-left"></i> Volver al inicio
+              </button>
+            </section>
+
+            <!-- ===== YA SOY CLIENTE ===== -->
+            <section class="step" data-step="5" hidden>
+              <p class="step-prompt">¿Cuál es tu celular?</p>
+              <input type="tel" id="soy-telefono" placeholder="Tu celular" maxlength="20"
+                     autocomplete="tel" inputmode="tel" enterkeyhint="go">
+              <button type="button" class="btn-primary" id="soy-buscar">Continuar</button>
+
+              <div id="soy-resultado" hidden>
+                <p class="saludo" id="soy-saludo"></p>
+                <div class="share-box" id="soy-proxima" hidden></div>
+                <button type="button" class="welcome-option" id="soy-siempre" hidden>
+                  <i class="fa-light fa-repeat"></i> <span id="soy-siempre-texto"></span>
+                </button>
+                <button type="button" class="welcome-option" id="soy-otra">
+                  <i class="fa-light fa-calendar-plus"></i> <span>Hacer otra cita</span>
+                </button>
+              </div>
+
+              <button type="button" class="handle-back" data-volver="0">
+                <i class="fa-light fa-chevron-left"></i> Regresar
+              </button>
+            </section>
+
+          </div>
+
+          <p class="error" id="error"></p>
+        </div>
+      </div>
+
+      <div class="calendar-bottom"></div>
+    </div>
+
+  </div>
+
+  <script src="/negocio.js?v=1"></script>
+</body>
+</html>

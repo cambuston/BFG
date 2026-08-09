@@ -4,9 +4,11 @@
 // y a propósito no se toca aquí.
 
 const express = require('express');
-const { db } = require('./handles.db');
+const { db } = require('./db');
 const { normalize, validate } = require('./handles');
 const { brandFor } = require('./brand');
+const sesion = require('./sesion');
+const negocio = require('./negocio');
 
 const router = express.Router();
 
@@ -14,7 +16,7 @@ const findHandle = db.prepare(
   'SELECT handle FROM handles WHERE brand = ? AND handle = ?'
 );
 const findAccount = db.prepare(
-  'SELECT handle FROM handles WHERE brand = ? AND auth_provider = ? AND auth_sub = ?'
+  'SELECT id, handle FROM handles WHERE brand = ? AND auth_provider = ? AND auth_sub = ?'
 );
 const insertHandle = db.prepare(`
   INSERT INTO handles (brand, handle, auth_provider, auth_sub, email, display_name, created_at)
@@ -64,6 +66,8 @@ router.post('/claim', (req, res) => {
   // mandamos a la suya. (Volver a entrar con el mismo Google no debe fallar.)
   const existing = findAccount.get(brand.id, provider, sub);
   if (existing) {
+    // Volver a entrar con el mismo Google es, de hecho, iniciar sesión.
+    sesion.crear(res, existing.id);
     return res.json({
       ok: true,
       already: true,
@@ -74,16 +78,18 @@ router.post('/claim', (req, res) => {
 
   const opt = (v, max) => (typeof v === 'string' && v.trim()) ? v.trim().slice(0, max) : null;
 
+  const nombre = opt(auth.name, 120);
+  let nuevoId;
   try {
-    insertHandle.run(
+    nuevoId = insertHandle.run(
       brand.id,
       handle,
       provider,
       sub,
       opt(auth.email, 200),
-      opt(auth.name, 120),
+      nombre,
       Date.now()
-    );
+    ).lastInsertRowid;
   } catch (err) {
     // SQLITE_CONSTRAINT_UNIQUE: alguien lo tomó mientras se autenticaba.
     if (err && String(err.code || '').startsWith('SQLITE_CONSTRAINT')) {
@@ -91,6 +97,11 @@ router.post('/claim', (req, res) => {
     }
     throw err;
   }
+
+  // El negocio nace con servicios y horario de ejemplo: quien acaba de darse
+  // de alta ya tiene página que funciona, en vez de una pantalla vacía.
+  negocio.estrenar(nuevoId, nombre);
+  sesion.crear(res, nuevoId);
 
   res.status(201).json({
     ok: true,

@@ -1,0 +1,477 @@
+/* El área del profesional. Es la única pantalla que NO usa el calendario de
+   argollas: aquí se trabaja (listas largas, formularios, buscar), y el marco
+   del calendario estorbaría. Lo que sí se conserva es todo lo demás de Días
+   que Cuentan: el azul plano, Inter 200, las tarjetas, .member-row, los
+   botones y los inputs. */
+
+body.mi {
+  /* A diferencia del alta, aquí la página NO scrollea: es un shell de app con
+     pestañas fijas abajo, y el scroll vive dentro del área central. */
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+body.con-hoja { overflow: hidden; }
+
+.mi-wrap {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+/* ---------- Cabecera ---------- */
+.mi-header {
+  flex: 0 0 auto;
+  padding: 18px 20px 12px;
+  color: #fff;
+  text-align: center;
+}
+
+.mi-header h1 {
+  font-size: 1.6rem;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+}
+
+.mi-sub {
+  margin-top: 2px;
+  font-size: 0.85rem;
+  font-weight: 300;
+  opacity: 0.75;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- Área central: lo único que scrollea ---------- */
+.mi-main {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 4px 18px 24px;
+}
+
+.vista-nota {
+  margin: 0 0 12px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.92rem;
+  font-weight: 300;
+  text-align: center;
+}
+
+.empty {
+  padding: 28px 10px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.98rem;
+  font-weight: 300;
+  text-align: center;
+}
+
+/* ---------- Hoy: el día que se está viendo ---------- */
+.dia-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.dia-actual {
+  flex: 1 1 auto;
+  padding: 10px;
+  border: none;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font-family: inherit;
+  font-size: 1.05rem;
+  font-weight: 400;
+  cursor: pointer;
+}
+
+/* Solo la primera letra: `capitalize` escribía "Viernes 14 De Agosto". */
+.dia-actual::first-letter { text-transform: uppercase; }
+
+.dia-flecha {
+  flex: 0 0 auto;
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.dia-flecha:active, .dia-actual:active { background: rgba(255, 255, 255, 0.24); }
+
+.member-row.cancelada { opacity: 0.45; text-decoration: line-through; }
+
+/* Botón de WhatsApp al final de una fila (Regresos). */
+.wa-btn {
+  flex: 0 0 auto;
+  margin-left: auto;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: #25D366;
+  color: #fff;
+  font-size: 1.15rem;
+  text-decoration: none;
+}
+
+.wa-btn:active { transform: scale(0.94); }
+
+/* ---------- Buscador ---------- */
+.buscador {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding: 0 14px;
+  border-radius: 16px;
+  background: #fff;
+  min-height: 52px;
+}
+
+.buscador i { color: rgba(27, 42, 74, 0.4); }
+
+.buscador input {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: none;
+  background: none;
+  outline: none;
+  font-family: inherit;
+  font-size: 1rem;
+  color: var(--text);
+  -webkit-appearance: none;
+}
+
+/* ---------- Mi negocio: bloques ---------- */
+.bloque {
+  margin-bottom: 18px;
+  padding: 18px 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.bloque-titulo {
+  margin: 0 0 10px;
+  color: #fff;
+  font-size: 1.02rem;
+  font-weight: 400;
+  text-align: left;
+}
+
+.bloque label {
+  margin: 12px 0 6px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.88rem;
+  font-weight: 300;
+}
+
+.bloque input[type="text"],
+.bloque input[type="number"],
+.bloque input[type="date"] {
+  min-height: 50px;
+  padding: 12px 14px;
+  border: none;
+  border-radius: 14px;
+  background: #fff;
+  font-size: 1rem;
+}
+
+.fila-dias { display: flex; align-items: center; gap: 10px; }
+.fila-dias input { width: 90px; }
+.fila-dias span { color: rgba(255, 255, 255, 0.85); font-size: 0.92rem; font-weight: 300; }
+
+.fila-cerrar { display: flex; gap: 8px; margin-bottom: 10px; }
+.fila-cerrar input { flex: 1 1 0; min-width: 0; }
+
+/* ---------- Servicios y días cerrados ---------- */
+.servicio-fila {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--text);
+}
+
+.servicio-info { flex: 1 1 auto; min-width: 0; text-align: left; }
+.servicio-n { font-size: 1rem; font-weight: 500; overflow-wrap: anywhere; }
+.servicio-d { font-size: 0.82rem; color: #44598A; }
+
+.icono {
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: 10px;
+  background: #EDF3FF;
+  color: var(--primary);
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.icono:active { transform: scale(0.94); }
+
+/* ---------- Horario ---------- */
+.dia-fila {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--text);
+}
+
+.dia-fila.apagado { opacity: 0.42; }
+.dia-check { width: 20px; height: 20px; flex: 0 0 auto; accent-color: var(--primary); }
+.dia-nombre { flex: 1 1 auto; min-width: 0; text-align: left; font-size: 0.88rem; font-weight: 500;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dia-a { font-size: 0.8rem; color: #44598A; }
+
+.dia-hora {
+  flex: 0 0 auto;
+  /* 112px, no 92: el navegador pinta <input type="time"> en el formato del
+     sistema, y con 12 horas el "am/pm" se cortaba — "19:00" se leía "07:00". */
+  width: 112px;
+  min-height: 38px;
+  padding: 6px 8px;
+  border: 1px solid #DCE8FF;
+  border-radius: 10px;
+  background: #F7FAFF;
+  font-family: inherit;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.salir { display: block; margin: 6px auto 20px; }
+
+/* ---------- Pestañas de abajo ---------- */
+.mi-tabs {
+  flex: 0 0 auto;
+  display: flex;
+  padding: 6px 6px calc(6px + var(--safe-bottom, 0px));
+  background: rgba(0, 0, 0, 0.16);
+}
+
+.tab {
+  flex: 1 1 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 8px 2px;
+  border: none;
+  border-radius: 12px;
+  background: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 300;
+  cursor: pointer;
+}
+
+.tab i { font-size: 1.15rem; }
+.tab.is-activa { color: #fff; background: rgba(255, 255, 255, 0.14); }
+
+/* El número de gente que ya debería haber vuelto. Es el único aviso de la
+   app: si sale, hay algo que hacer hoy. */
+.pastilla {
+  position: absolute;
+  top: 2px;
+  right: 50%;
+  margin-right: -22px;
+  min-width: 18px;
+  padding: 1px 5px;
+  border-radius: 999px;
+  background: #FFD54A;
+  color: #6B4E00;
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+/* ---------- La hoja que sube desde abajo ---------- */
+.hoja { position: fixed; inset: 0; z-index: 50; }
+
+.hoja-fondo {
+  position: absolute;
+  inset: 0;
+  background: rgba(6, 18, 46, 0.5);
+}
+
+.hoja-panel {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-height: 92vh;
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 22px 20px calc(24px + var(--safe-bottom, 0px));
+  border-radius: 24px 24px 0 0;
+  background: var(--brand-blue);
+  box-shadow: 0 -12px 40px rgba(6, 26, 82, 0.4);
+  overflow-y: auto;
+  animation: sube 0.22s ease;
+}
+
+@keyframes sube { from { transform: translateY(18px); opacity: 0.6; } }
+
+/* Quien prefiera menos movimiento, no lo tiene. */
+@media (prefers-reduced-motion: reduce) {
+  .hoja-panel { animation: none; }
+}
+
+.hoja-cerrar {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-size: 1.05rem;
+  cursor: pointer;
+}
+
+.hoja-titulo {
+  margin: 0 0 14px;
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 400;
+  text-align: center;
+}
+
+.hoja-panel label {
+  margin: 12px 0 6px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.88rem;
+  font-weight: 300;
+}
+
+.hoja-panel input,
+.hoja-panel select,
+.hoja-panel textarea {
+  width: 100%;
+  min-height: 50px;
+  padding: 12px 14px;
+  border: none;
+  border-radius: 14px;
+  background: #fff;
+  font-family: inherit;
+  font-size: 1rem;
+  color: var(--text);
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.hoja-panel textarea { min-height: 96px; resize: vertical; line-height: 1.45; }
+.hoja-panel .btn-soft { margin: 10px auto 0; display: block; }
+
+/* ---------- Ficha del cliente ---------- */
+.ficha-nombre {
+  margin: 0 0 2px;
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 400;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.ficha-tel {
+  display: block;
+  margin-bottom: 16px;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.92rem;
+  text-align: center;
+  text-decoration: none;
+}
+
+.ficha-datos {
+  margin-bottom: 6px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.ficha-dato { display: flex; align-items: center; gap: 12px; padding: 6px 0; }
+.ficha-dato i { width: 22px; text-align: center; color: rgba(255, 255, 255, 0.7); }
+.ficha-dato-txt { display: flex; flex-direction: column; min-width: 0; text-align: left; }
+.ficha-etq { font-size: 0.75rem; font-weight: 300; color: rgba(255, 255, 255, 0.6); }
+.ficha-val { font-size: 0.98rem; font-weight: 400; color: #fff; overflow-wrap: anywhere; }
+
+.historial {
+  padding: 4px 2px;
+  max-height: 190px;
+  overflow-y: auto;
+}
+
+.hist-fila {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 2px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+  font-weight: 300;
+}
+
+.hist-fila + .hist-fila { border-top: 1px solid rgba(255, 255, 255, 0.14); }
+.hist-fecha::first-letter { text-transform: uppercase; }
+.hist-serv { flex: 0 0 auto; opacity: 0.8; }
+
+/* Fichas de hora dentro de la hoja (apuntar una cita). */
+.hoja-panel .horas { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.hoja-panel .hora-btn {
+  width: auto;
+  min-height: 42px;
+  padding: 9px 13px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.92rem;
+  cursor: pointer;
+}
+
+.hoja-panel .hora-btn.elegida { background: #fff; color: var(--brand-blue); font-weight: 500; }
+
+/* ---------- Aviso flotante ---------- */
+.error.flotante {
+  position: fixed;
+  left: 50%;
+  bottom: calc(84px + var(--safe-bottom, 0px));
+  z-index: 60;
+  transform: translate(-50%, 12px);
+  max-width: min(88vw, 420px);
+  margin: 0;
+  padding: 12px 18px;
+  border-radius: 14px;
+  background: #16305E;
+  color: #fff;
+  font-size: 0.92rem;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.error.flotante.visible { opacity: 1; transform: translate(-50%, 0); }

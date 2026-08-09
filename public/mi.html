@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>{{BRAND_NAME}} · {{HANDLE}}</title>
+  <meta name="theme-color" content="{{BRAND_COLOR}}">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+
+  <link rel="stylesheet" href="/fonts/fonts.css?v=1">
+  <link rel="stylesheet" href="/fontawesome/css/all.min.css?v=2">
+  <link rel="stylesheet" href="/styles.css?v=1">
+  <link rel="stylesheet" href="/header-split.css?v=1">
+  <link rel="stylesheet" href="/calendar-form.css?v=1">
+  <link rel="stylesheet" href="/calendar-colors.css?v=1">
+  <link rel="stylesheet" href="/handle.css?v=1">
+  <link rel="stylesheet" href="/mi.css?v=1">
+
+  <style>
+    :root {
+      --brand-blue: {{BRAND_COLOR}};
+      --primary: {{BRAND_COLOR}};
+      --secondary: {{BRAND_COLOR}};
+    }
+  </style>
+  <script>
+    window.BRAND = {{BRAND_JSON}};
+    window.HANDLE = "{{HANDLE}}";
+  </script>
+</head>
+<body class="mi">
+  <div class="mi-wrap">
+
+    <header class="mi-header">
+      <h1 id="mi-titulo">Hoy</h1>
+      <p class="mi-sub" id="mi-sub"></p>
+    </header>
+
+    <main class="mi-main" id="mi-main">
+
+      <!-- ================= HOY ================= -->
+      <section class="vista" data-vista="hoy">
+        <div class="dia-nav">
+          <button type="button" class="dia-flecha" id="dia-ayer" aria-label="Día anterior">
+            <i class="fa-light fa-chevron-left"></i>
+          </button>
+          <button type="button" class="dia-actual" id="dia-actual"></button>
+          <button type="button" class="dia-flecha" id="dia-manana" aria-label="Día siguiente">
+            <i class="fa-light fa-chevron-right"></i>
+          </button>
+        </div>
+
+        <div id="agenda"></div>
+
+        <button type="button" class="btn-primary" id="nueva-cita">Apuntar una cita</button>
+      </section>
+
+      <!-- ================= CLIENTES ================= -->
+      <section class="vista" data-vista="clientes" hidden>
+        <div class="buscador">
+          <i class="fa-light fa-magnifying-glass"></i>
+          <input type="search" id="buscar" placeholder="Buscar por nombre o celular"
+                 autocomplete="off" enterkeyhint="search">
+        </div>
+        <div id="lista-clientes"></div>
+      </section>
+
+      <!-- ================= REGRESOS ================= -->
+      <section class="vista" data-vista="regresos" hidden>
+        <p class="vista-nota" id="regresos-nota"></p>
+        <div id="lista-regresos"></div>
+      </section>
+
+      <!-- ================= MI NEGOCIO ================= -->
+      <section class="vista" data-vista="negocio" hidden>
+        <div class="bloque">
+          <p class="bloque-titulo">Mi página</p>
+          <div class="share-box" id="mi-url"></div>
+          <div class="btn-row">
+            <button type="button" class="btn-soft" id="copiar">Copiar liga</button>
+            <button type="button" class="btn-soft" id="compartir">Compartir</button>
+          </div>
+        </div>
+
+        <div class="bloque">
+          <p class="bloque-titulo">Mis datos</p>
+          <label for="n-nombre">Nombre del negocio</label>
+          <input type="text" id="n-nombre" maxlength="80" placeholder="Barbería Juan">
+          <label for="n-whatsapp">WhatsApp</label>
+          <input type="text" id="n-whatsapp" maxlength="20" inputmode="tel" placeholder="686 123 4567">
+          <label for="n-ciudad">Ciudad</label>
+          <input type="text" id="n-ciudad" maxlength="60" placeholder="Mexicali">
+          <label for="n-regreso">Suelen regresar cada</label>
+          <div class="fila-dias">
+            <input type="number" id="n-regreso" min="1" max="365" inputmode="numeric">
+            <span>días</span>
+          </div>
+          <button type="button" class="btn-primary" id="guardar-negocio">Guardar</button>
+        </div>
+
+        <div class="bloque">
+          <p class="bloque-titulo">Servicios</p>
+          <div id="lista-servicios"></div>
+          <button type="button" class="btn-soft" id="nuevo-servicio">
+            <i class="fa-light fa-plus"></i> Agregar servicio
+          </button>
+        </div>
+
+        <div class="bloque">
+          <p class="bloque-titulo">Horario</p>
+          <div id="lista-horario"></div>
+          <button type="button" class="btn-primary" id="guardar-horario">Guardar horario</button>
+        </div>
+
+        <div class="bloque">
+          <p class="bloque-titulo">Días que no trabajo</p>
+          <div id="lista-cerrados"></div>
+          <div class="fila-cerrar">
+            <input type="date" id="c-fecha">
+            <input type="text" id="c-motivo" maxlength="60" placeholder="Motivo (opcional)">
+          </div>
+          <button type="button" class="btn-soft" id="agregar-cerrado">Marcar día cerrado</button>
+        </div>
+
+        <button type="button" class="btn-soft salir" id="salir">Cerrar sesión</button>
+      </section>
+
+    </main>
+
+    <!-- ================= PESTAÑAS ================= -->
+    <nav class="mi-tabs">
+      <button type="button" class="tab is-activa" data-ir="hoy">
+        <i class="fa-light fa-calendar-day"></i><span>Hoy</span>
+      </button>
+      <button type="button" class="tab" data-ir="clientes">
+        <i class="fa-light fa-users"></i><span>Clientes</span>
+      </button>
+      <button type="button" class="tab" data-ir="regresos">
+        <i class="fa-light fa-rotate-left"></i><span>Regresos</span>
+        <span class="pastilla" id="badge-regresos" hidden></span>
+      </button>
+      <button type="button" class="tab" data-ir="negocio">
+        <i class="fa-light fa-gear"></i><span>Mi negocio</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- ================= HOJA: ficha del cliente / nueva cita ================= -->
+  <div class="hoja" id="hoja" hidden>
+    <div class="hoja-fondo" id="hoja-fondo"></div>
+    <div class="hoja-panel" role="dialog" aria-modal="true">
+      <button type="button" class="hoja-cerrar" id="hoja-cerrar" aria-label="Cerrar">
+        <i class="fa-light fa-xmark"></i>
+      </button>
+      <div id="hoja-cuerpo"></div>
+    </div>
+  </div>
+
+  <p class="error flotante" id="error"></p>
+
+  <script src="/mi.js?v=1"></script>
+</body>
+</html>
