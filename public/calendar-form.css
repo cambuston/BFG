@@ -1,0 +1,609 @@
+/* Formulario dentro del calendario: flujo guiado por pasos con el look de
+   los "días" del icono. El ancho lo define el padding de .calendar-mid
+   (alineado al área azul de mid.png), así que todo va a width: 100%. */
+
+/* Sube el card completo un poco, más cerca del subtítulo "Celebra cada día…". */
+#create-card {
+  margin-top: -6px;
+}
+
+.calendar-mid {
+  padding-top: 28px;
+  /* Altura mínima igual a la del paso más alto (paso 1: título + nombre + info),
+     para que el paso 1 y el paso 2 con el calendario cerrado midan lo mismo y no
+     se vea un salto al avanzar. Al abrir el calendario el contenido es más alto
+     que este mínimo, así que ese paso crece sin problema. */
+  min-height: 260px;           /* = paso 1 cerrado (título + nombre + info 3 líneas) */
+  padding-bottom: 2px;         /* menos alto bajo el calendario (teléfonos chicos) */
+  /* La página no scrollea (body overflow hidden): si el paso con el calendario
+     desplegado no cabe (teléfonos bajos), scrollea dentro del área azul.
+     Sin barra visible: scroll táctil/rueda, como app. */
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.calendar-mid::-webkit-scrollbar { display: none; }
+
+/* El error vacío no reserva espacio: quita el hueco bajo "1 de julio..." y bajo
+   el campo de info. Cuando hay un error real, aparece y empuja el contenido. */
+#error:empty { display: none; }
+
+/* ---------- Pasos ---------- */
+.steps {
+  position: relative;
+  width: 100%;
+}
+
+.step {
+  width: 100%;
+  transition: opacity 0.28s ease, transform 0.3s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/* El paso que sale se posiciona absoluto para que el que entra defina la
+   altura: así no hay salto de layout durante la transición. */
+.step.leaving {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+}
+
+/* .calendar-dialog para ganarle en especificidad a `.calendar-dialog p`
+   (styles.css), que si no pinta el texto oscuro en vez de blanco. */
+.calendar-dialog .step-prompt {
+  margin: -20px 0 12px;   /* mismo valor para ambos pasos -> misma distancia al borde del calendario */
+  font-size: 1.2rem;
+  font-weight: 400;
+  color: #fff;
+  text-align: center;
+}
+
+/* Fechas del calendario (mes y fecha elegida): mismo estilo que las preguntas.
+   El prefijo .calendar-dialog le gana en especificidad a `.calendar-dialog p`,
+   que si no pintaba la fecha elegida en oscuro. */
+.calendar-dialog .cal-month,
+.calendar-dialog .cal-selected {
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 400;
+}
+
+/* Fila nombre + botón de fecha: el input toma el ancho y el botón queda a su
+   derecha. El espacio corto hacia el calendario lo da el margen inferior de la fila. */
+.name-row {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  width: 100%;
+  margin-bottom: 14px;
+}
+
+.name-row input[type="text"] {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+}
+
+/* Botón para abrir el calendario: el icono de Días que Cuentan, cuadrado y a la
+   altura del input. Visible solo mientras el nombre tiene foco. */
+.pick-date-btn {
+  flex: 0 0 auto;
+  width: 56px;
+  padding: 0;
+  border: none;
+  border-radius: 16px;
+  background: url('/icon-192.png') center / contain no-repeat;
+  cursor: pointer;
+  box-shadow: none;
+  transition: transform 0.12s ease;
+}
+
+.pick-date-btn:active { transform: scale(0.94); }
+
+/* Inputs de texto (pasos 1 y 2): un cuadro por paso. El color/sombra
+   "día blanco" viene de styles.css. */
+.calendar-dialog input[type="text"] {
+  width: 100%;
+  min-height: 56px;
+  margin: 0 auto;
+  display: block;
+  padding: 16px 18px;
+  font-size: 1rem;          /* mismo tamaño que el textarea de "Información..." */
+}
+
+/* Información adicional (paso 1): campo opcional de dos líneas bajo el nombre. */
+.calendar-dialog textarea {
+  width: 100%;
+  min-height: 0;
+  margin: 12px auto 0;
+  display: block;
+  padding: 13px 18px;
+  font-size: 1rem;
+  line-height: 1.35;
+  resize: none;
+}
+
+/* ---------- Paso 3: calendario custom dentro del panel azul ---------- */
+.cal {
+  width: 100%;
+}
+
+.cal-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.cal-nav-group {
+  display: flex;
+  gap: 5px;
+  flex: 0 0 auto;
+}
+
+.cal-month {
+  flex: 1;
+  text-align: center;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 0.2px;
+  /* Nunca partir la barra en dos líneas: cambiaría el alto del calendario. */
+  white-space: nowrap;
+}
+
+.cal-arrow {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: none;
+  transition: background 0.15s ease, transform 0.12s ease;
+}
+
+/* Flechas de año (« »): un poco más discretas que las de mes */
+.cal-arrow--year {
+  background: rgba(255, 255, 255, 0.12);
+  font-size: 1.15rem;
+}
+
+.cal-arrow:active { transform: scale(0.88); }
+.cal-arrow:disabled { opacity: 0.28; cursor: default; box-shadow: none; }
+
+.cal-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+  margin-bottom: 7px;
+}
+
+.cal-weekdays span {
+  text-align: center;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+}
+
+.cal-day {
+  aspect-ratio: 1 / 1;
+  border: none;
+  border-radius: 26%;
+  background: #A6C2FC;
+  color: #1B2A4A;
+  font-size: 0.9rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: none;
+  animation: cell-in 0.24s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transition: transform 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+/* Días de otro mes: apenas visibles */
+.cal-day.is-outside {
+  background: rgba(255, 255, 255, 0.10);
+  color: rgba(255, 255, 255, 0.35);
+  box-shadow: none;
+  cursor: default;
+}
+
+/* Días futuros del mes actual: no seleccionables */
+.cal-day:disabled:not(.is-outside) {
+  opacity: 0.4;
+  cursor: default;
+  box-shadow: none;
+}
+
+/* Hoy: borde dorado sutil */
+.cal-day.is-today {
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+/* Día seleccionado: el cuadrito blanco de la referencia */
+.cal-day.is-selected {
+  background: #fff;
+  color: var(--primary);
+  box-shadow: none;
+}
+
+.cal-day.is-selected.is-today {
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+.cal-day.bounce {
+  animation: day-bounce 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cal-selected {
+  margin: 14px 0 0;
+  min-height: 1.3em;
+  text-align: center;
+  font-size: 1.02rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+@keyframes cell-in {
+  from { opacity: 0; transform: scale(0.55); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes day-bounce {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.18); }
+  100% { transform: scale(1); }
+}
+
+/* ---------- Destello, check y back ---------- */
+
+/* En la pantalla de registro el destello superior es un "spark", no la
+   estrella. La estrella aparece después, en la lista de eventos
+   (group.html, que no carga este archivo y conserva star.png). */
+.calendar-dialog::before {
+  background-image: url('/spark.png?v=1');
+  aspect-ratio: 1 / 1;
+}
+
+/* Ocultamos el check decorativo del calendario (pseudo-elemento). */
+#create-card::after { content: none; }
+
+/* ---------- Botón reutilizable: empty.png + icono de Font Awesome ----------
+   Crear un botón nuevo es trivial:
+     <button class="icon-btn"><i class="fa-solid fa-plus"></i></button>
+   Para la variante roja, añade la clase .icon-btn--red. El icono va en blanco;
+   el tamaño se ajusta solo al del botón con unidades de contenedor (cqmin). */
+.icon-btn {
+  --btn-color: var(--brand-blue);               /* color del disco; .icon-btn--red lo cambia */
+  padding: 0;
+  border: none;
+  cursor: pointer;
+  color: #fff;                                  /* color del icono FA */
+  /* Capa superior: aro blanco + sombra (empty.png, centro transparente).
+     Capa inferior: disco de color CSS recortado a círculo (no llega a las
+     esquinas, así no se desborda). El icono va en el contenido, sobre ambas. */
+  background:
+    url('/empty.png?v=3') center / contain no-repeat,
+    radial-gradient(circle closest-side, var(--btn-color) var(--btn-disc), transparent var(--btn-disc));
+  display: grid;
+  place-items: center;
+  container-type: size;
+}
+
+.icon-btn > i,
+.icon-btn .icon-layer {
+  font-size: 46cqmin;                           /* ~46% del lado del botón */
+  line-height: 1;
+}
+
+/* Icono personalizado por imagen (p. ej. tu "arrows-up-to-people") en una capa
+   del botón, en lugar de un glifo Font Awesome. El tamaño lo da el propio
+   padding de la imagen (contain). */
+.icon-btn .icon-img {
+  background: center / contain no-repeat;
+}
+
+/* Variante roja: solo cambia el color del disco; el aro e icono siguen igual. */
+.icon-btn--red {
+  --btn-color: var(--btn-red);
+}
+
+/* Botones flotantes de navegación: check a la derecha (avanzar/confirmar),
+   back a la izquierda (regresar). Viven dentro de .calendar-dialog, así que
+   heredan la sombra flotante del filtro del contenedor. */
+.calendar-check-btn {
+  position: absolute;
+  bottom: -26px;               /* más abajo (el usuario lo pidió) */
+  width: 28%;
+  aspect-ratio: 1 / 1;
+  z-index: 4;
+  animation: check-pop 0.32s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: transform 0.15s ease;
+}
+
+.calendar-check-btn {
+  right: -14px;
+}
+
+/* Botón "regresar": pestaña blanca con chevron azul */
+.calendar-back-btn {
+  position: absolute;
+  left: -4px;
+  top: 90px;
+  bottom: auto;
+
+  width: 40px;
+  height: 92px;
+  padding: 0;
+
+  border: none;
+  cursor: pointer;
+  z-index: 4;
+
+  background: #fafafc;
+  color: var(--brand-blue);
+
+  /* Recto del lado derecho */
+  border-radius: 16px 0 0 16px;
+
+  display: grid;
+  place-items: center;
+
+  /* Sombra solo hacia afuera, no del lado derecho */
+  box-shadow: -8px 10px 22px rgba(6, 26, 82, 0.24);
+
+  container-type: size;
+  animation: check-pop 0.32s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: transform 0.15s ease;
+}
+
+.calendar-back-btn > i {
+  position: absolute;
+  left: 3px;
+  top: 50%;
+  font-size: 32px;
+  line-height: 1;
+  transform: translateY(-50%);
+  color: var(--brand-blue);
+}
+/* Un solo glifo: cambia entre check y contexto sin capas superpuestas. */
+.calendar-check-btn .icon-layer {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  transition:
+    opacity 0.36s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.36s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.calendar-check-btn {
+  --icon-x: 24px;
+  --icon-y: 0px;
+  --people-y: 0px;
+  --star-y: -2px;
+  --check-y: 0px;
+}
+
+.calendar-check-btn .icon-main {
+  opacity: 1;
+  font-size: 46cqmin;
+  line-height: 1;
+  transform: translateX(var(--icon-x)) translateY(var(--icon-y)) scale(1);
+}
+
+.calendar-check-btn .icon-main.fa-people-roof {
+  --icon-y: var(--people-y);
+}
+
+.calendar-check-btn .icon-main.fa-calendar-star {
+  --icon-y: var(--star-y);
+}
+
+.calendar-check-btn .icon-main.fa-check {
+  --icon-y: var(--check-y);
+}
+
+
+
+@keyframes check-pop {
+  from { opacity: 0; transform: scale(0.4); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@media (max-width: 380px) {
+  .step-prompt { font-size: 0.96rem; }
+  .cal-day { font-size: 0.82rem; }
+}
+
+/* Teléfonos muy angostos: flechas y mes más chicos para que "Sep 2025" quepa
+   en una línea entre las flechas (si no, el texto se encima con ellas). */
+@media (max-width: 344px) {
+  .cal-arrow { width: 28px; height: 28px; font-size: 1.05rem; }
+  .cal-arrow--year { font-size: 0.95rem; }
+  .calendar-dialog .cal-month { font-size: 1rem; }
+}
+
+/* ---------- "Guarda tu liga" (obligatoria tras crear el grupo) ----------
+   Cubre toda la pantalla con el mismo azul del fondo: no hay forma de
+   esquivarla más que con sus dos botones. */
+.savekey {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: linear-gradient(160deg, #2F6BFF 0%, #1E51D6 100%);
+}
+.savekey[hidden] { display: none; }
+
+.savekey-card {
+  width: min(100%, 380px);
+  text-align: center;
+  color: #fff;
+}
+.savekey-emoji { margin: 0 0 10px; font-size: 3rem; }
+.savekey-title { margin: 0 0 12px; font-size: 1.4rem; font-weight: 500; }
+.savekey-text { margin: 0 0 26px; font-size: 1rem; line-height: 1.5; opacity: 0.92; }
+
+.savekey-wa {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 54px;
+  margin-bottom: 12px;
+  padding: 14px 18px;
+  border: none;
+  border-radius: 18px;
+  background: #25D366;          /* verde WhatsApp, como el botón de invitar */
+  color: #fff;
+  font-family: inherit;
+  font-size: 1.08rem;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 14px 30px rgba(6, 26, 82, 0.32);
+  transition: transform 0.12s ease;
+}
+.savekey-wa:active { transform: scale(0.97); }
+.savekey-wa i { font-size: 1.35rem; }
+
+.savekey-go {
+  display: block;
+  width: 100%;
+  min-height: 50px;
+  padding: 12px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 400;
+  cursor: pointer;
+  transition: transform 0.12s ease;
+}
+.savekey-go:active { transform: scale(0.97); }
+
+/* ---------- Bienvenida (paso 0): dos caminos dentro de la tarjeta ---------- */
+.welcome-option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 56px;
+  margin: 0 0 14px;
+  padding: 14px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.12);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 1.02rem;
+  font-weight: 400;
+  color: #fff;
+  transition: transform 0.12s ease, background 0.15s ease;
+}
+.welcome-option:active { transform: scale(0.97); background: rgba(255, 255, 255, 0.2); }
+.welcome-option i { font-size: 1.15rem; opacity: 0.9; }
+.welcome-option:last-child { margin-bottom: 0; }
+
+/* Botón "vidrio" (blanco translúcido con borde), como los de la landing de
+   unirse: presente sin competir con el flujo principal de crear grupo. */
+.invite-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 46px;
+  padding: 11px 22px;
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.12);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.98rem;
+  font-weight: 400;
+  color: #fff;
+  transition: transform 0.12s ease, background 0.15s ease;
+}
+.invite-toggle:active { transform: scale(0.97); background: rgba(255, 255, 255, 0.2); }
+.invite-toggle i { font-size: 1.05rem; opacity: 0.9; }
+
+/* Cambio de idioma (es/en): liga discreta ARRIBA a la derecha (fuera del pie,
+   que es de la invitación). El body ya trae el padding del safe-area. */
+.lang-toggle {
+  position: absolute;
+  top: calc(var(--safe-top, 0px) + 4px);
+  right: 10px;
+  z-index: 5;
+  padding: 4px 12px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);   /* pastilla vidrio: legible aunque
+                                              roce el título en pantallas angostas */
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 400;
+  color: #fff;
+  opacity: 0.85;
+}
+.lang-toggle:active { opacity: 1; }
+
+.invite-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+.invite-row[hidden] { display: none; }
+
+.invite-row input {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 48px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 14px;
+  background: #fff;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.98rem;
+  font-weight: 400;
+}
+
+.invite-row button {
+  flex: 0 0 auto;
+  width: 48px;
+  min-height: 48px;
+  border: none;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.22);
+  color: #fff;
+  font-size: 1.05rem;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+.invite-row button:active { transform: scale(0.93); }

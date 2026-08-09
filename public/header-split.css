@@ -1,0 +1,83 @@
+/* Header compacto: icono a la izquierda, leyendas a la derecha.
+   El padding horizontal iguala el del cuerpo del calendario (.calendar-mid)
+   para que el logo quede alineado con el borde izquierdo de los inputs. */
+.hero {
+  width: min(100%, 390px);
+  margin: 0 auto;
+  /* Izquierda al 8.8% para alinear el logo con el borde visible del
+     calendario (el marco blanco de los PNG empieza en ~8.8% del ancho).
+     Deja espacio para que el título quepa en una sola línea. */
+  padding: 26px 8px 12px 8.8%;
+
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 12px;
+  align-items: center;
+
+  text-align: left;
+
+  /* El header flota como el calendario: drop-shadow (no box-shadow) sigue la
+     silueta —icono Y letras proyectan sombra— para que header y calendario
+     se lean en el mismo plano. La primera sombra va CERCANA y densa (es la
+     que se alcanza a ver en trazos delgados de texto); la segunda da la
+     elevación larga, como la del calendario. */
+  filter:
+    drop-shadow(0 6px 8px rgba(6, 26, 82, 0.60))
+    drop-shadow(0 22px 30px rgba(6, 26, 82, 0.35));
+}
+
+/* La sombra propia del logo (box-shadow rectangular) estorbaría: el filter
+   del hero la volvería a sombrear. El flotado ya lo da el drop-shadow. */
+.hero .logo { box-shadow: none; }
+
+.hero .logo {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+
+  width: 72px;
+  height: 72px;
+  margin: 0;
+  justify-self: start;
+}
+
+.hero h1 {
+  grid-column: 2;
+  grid-row: 1;
+  /* 1.42rem: "Días que Cuentan" (16 caracteres con tracking 0.14em) cabe en
+     UNA línea dentro de la columna del texto (~264px). */
+  font-size: 1.42rem;
+  line-height: 1.05;
+  margin: 0;
+}
+
+.hero .subtitle {
+  grid-column: 2;
+  grid-row: 2;
+  margin-top: 5px;
+  font-size: 0.98rem;
+  line-height: 1.2;
+  /* Centrado en su columna, igual que se lee el título (que llena la línea). */
+  text-align: center;
+}
+
+@media (max-width: 360px) {
+  .hero {
+    grid-template-columns: 68px 1fr;
+    column-gap: 10px;
+    padding-top: 22px;
+  }
+
+  .hero .logo {
+    width: 62px;
+    height: 62px;
+  }
+
+  .hero h1 {
+    font-size: 1.22rem;
+  }
+
+  .hero .subtitle {
+    font-size: 0.9rem;
+  }
+}

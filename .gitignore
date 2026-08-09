@@ -1,0 +1,18 @@
+node_modules/
+
+# Base de datos local (nunca a git)
+data/
+*.db
+*.db-shm
+*.db-wal
+
+# Secretos
+.env
+
+# Capturas que generan las pruebas de navegador (se rehacen con npm test)
+test/screenshots/
+
+# Local del agente. settings.json SÍ se sube (permisos del proyecto);
+# settings.local.json no (preferencias personales de cada máquina).
+.claude/settings.local.json
+.DS_Store

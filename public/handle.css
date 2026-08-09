@@ -1,0 +1,144 @@
+/* Piezas nuevas de Flecos y Barbas. Todo lo demás (fondo, calendario, hero,
+   botones, tipografía) viene tal cual de Días que Cuentan — este archivo no
+   cambia nada de aquello, solo agrega lo que allá no existía. */
+
+/* ---------- Caja del identificador: flecos.mx/[ juan ] ----------
+   Un solo cuadro blanco, con el dominio en gris a la izquierda y el campo
+   pegado a la derecha. Mismo alto y mismo radio que los inputs del
+   calendario, para que se lea como un campo más. */
+.handle-box {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 56px;
+  padding: 0 16px;
+  border-radius: 16px;
+  background: #fff;
+  text-align: left;
+  transition: box-shadow 0.15s ease;
+}
+
+.handle-box.is-ok    { box-shadow: 0 0 0 2.5px rgba(255, 255, 255, 0.55); }
+.handle-box.is-error { box-shadow: 0 0 0 2.5px #FFB3B3; }
+
+.handle-prefix {
+  flex: 0 0 auto;
+  color: rgba(27, 42, 74, 0.45);
+  font-size: 1rem;
+  font-weight: 400;
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* Gana en especificidad al input blanco de .calendar-dialog: aquí el cuadro
+   blanco es la caja de afuera, el campo va transparente y sin marco. */
+.calendar-dialog .handle-box input[type="text"] {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 14px 0;
+  border: none;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  color: var(--text);
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.calendar-dialog .handle-box input::placeholder {
+  color: rgba(27, 42, 74, 0.28);
+  font-weight: 400;
+}
+
+/* ---------- Línea de estado (✅ disponible / ya existe) ---------- */
+.calendar-dialog .handle-status {
+  min-height: 1.35em;
+  margin: 9px 0 12px;
+  font-size: 0.95rem;
+  font-weight: 400;
+  line-height: 1.35;
+  color: #fff;
+  text-align: center;
+}
+
+.handle-status.is-ok    { color: #DFF7E4; }
+.handle-status.is-error { color: #FFD9D9; }
+.handle-status .fa-check,
+.handle-status i { margin-right: 6px; }
+
+/* Botón principal apagado mientras no hay un identificador válido y libre. */
+.calendar-dialog .btn-primary:disabled {
+  opacity: 0.4;
+  box-shadow: none;
+  cursor: default;
+}
+
+/* ---------- Paso 2 ---------- */
+
+/* La dirección que acaba de elegir, para que no se le olvide qué está
+   guardando mientras decide con cuál cuenta entrar. */
+.calendar-dialog .handle-echo {
+  margin: -4px 0 16px;
+  font-size: 1.02rem;
+  font-weight: 500;
+  color: #fff;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+/* Los botones de proveedor son .welcome-option (de Días que Cuentan); solo
+   se alinea el icono de marca a un ancho fijo para que los tres textos
+   empiecen en la misma columna. */
+.welcome-option .fa-brands {
+  width: 22px;
+  text-align: center;
+}
+
+/* "Continuar con Facebook" es el más largo de los tres: un pelo más chico
+   para que los tres quepan en UNA línea y se lean como una misma lista. */
+[data-step="2"] .welcome-option {
+  font-size: 0.97rem;
+  white-space: nowrap;
+}
+
+.handle-back {
+  margin-top: 4px;
+  padding: 10px 8px;
+  border: none;
+  background: none;
+  color: rgba(255, 255, 255, 0.75);
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 400;
+  cursor: pointer;
+}
+.handle-back:active { color: #fff; }
+.handle-back i { margin-right: 5px; }
+
+/* ---------- Listo ---------- */
+.calendar-dialog .share-box {
+  background: rgba(255, 255, 255, 0.92);
+  font-weight: 500;
+  text-align: center;
+}
+
+.calendar-dialog .handle-note {
+  margin: 14px 0 0;
+  font-size: 0.92rem;
+  font-weight: 300;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.8);
+  text-align: center;
+}
+
+/* Aviso de que la identidad es de mentiras (AUTH_MODE=demo). Solo aparece
+   cuando el servidor lo dice; en producción no existe. */
+.demo-flag {
+  margin: 10px 0 0;
+  font-size: 0.82rem;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.62);
+  text-align: center;
+}

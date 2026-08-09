@@ -1,0 +1,77 @@
+/* Recolorea el cuerpo del calendario (top/mid/bottom) con --brand-blue en vez
+   del azul horneado en los PNG. Así el azul de TODO el calendario se cambia en
+   un solo lugar (:root --brand-blue en styles.css), igual que los botones.
+
+   Cada sección se arma en dos capas:
+     ::before  relleno de color CSS, recortado con mask a la SILUETA del PNG
+               (por eso las esquinas redondeadas y los anillos no se desbordan).
+     ::after   marco blanco + decoraciones (el PNG con el azul vuelto transparente).
+   El contenido (título / formulario) va por encima con z-index. */
+
+.calendar-top,
+.calendar-mid,
+.calendar-bottom {
+  position: relative;
+  background: none;                 /* quita el PNG con azul horneado */
+}
+
+.calendar-top::before, .calendar-top::after,
+.calendar-mid::before, .calendar-mid::after,
+.calendar-bottom::before, .calendar-bottom::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* --- Capa de relleno: color de marca recortado a la silueta de cada sección --- */
+.calendar-top::before,
+.calendar-mid::before,
+.calendar-bottom::before {
+  background-color: var(--brand-blue);
+  z-index: 0;
+}
+
+.calendar-top::before {
+  -webkit-mask: url('/top-sil.png?v=2') center bottom / 100% auto no-repeat;
+          mask: url('/top-sil.png?v=2') center bottom / 100% auto no-repeat;
+}
+/* El tramo MEDIO ya no usa PNG: puro CSS (geometría medida de mid-frame.png:
+   carta de 114→1217 px de 1289; borde blanco ≈49 px ≈ 4.44% de la carta).
+   Así el mid puede medir CUALQUIER altura sin estirar imágenes y la costura
+   con top/bottom no se mueve. El gradiente pinta borde-azul-borde de un tiro. */
+.calendar-mid::before {
+  left: 8.84%;
+  right: 5.51%;
+  background: linear-gradient(to right,
+      #FAFAFC 0 4.44%,
+      var(--brand-blue) 4.44% 95.2%,
+      #FAFAFC 95.2% 100%);
+}
+.calendar-bottom::before {
+  -webkit-mask: url('/bottom-sil.png?v=2') center top / 100% auto no-repeat;
+          mask: url('/bottom-sil.png?v=2') center top / 100% auto no-repeat;
+}
+
+/* --- Capa de marco: blanco + decoraciones (mismo tamaño/posición que el original) --- */
+.calendar-top::after {
+  background: url('/top-frame.png?v=2') center bottom / 100% auto no-repeat;
+  z-index: 1;
+}
+.calendar-mid::after { content: none; }  /* el marco medio ya es CSS (::before) */
+.calendar-bottom::after {
+  background: url('/bottom-frame.png?v=2') center top / 100% auto no-repeat;
+  z-index: 1;
+}
+
+/* Cierra la costura sub-pixel entre secciones: el mid (relleno + marco) solapa
+   1px sobre top y bottom. Como todo es azul/blanco alineado, el solape es invisible. */
+.calendar-mid::before,
+.calendar-mid::after {
+  top: -1px;
+  bottom: -1px;
+}
+
+/* El contenido debe quedar por encima de las dos capas del cuerpo. */
+.calendar-content { z-index: 2; }
+.calendar-top .calendar-title { z-index: 2; }

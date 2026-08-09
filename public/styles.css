@@ -1,0 +1,990 @@
+﻿:root {
+  --primary: #2F6BFF;
+  --secondary: #5AA8FF;
+  --accent: #FFD54A;
+  /* === Botones .icon-btn (aro empty.png + disco de color + icono FA) ===
+     Ajusta ESTOS valores y recarga para probar. */
+  --brand-blue: #2F6BFF;   /* color del disco azul (marca) */
+  --btn-red: #C62828;      /* color del disco en .icon-btn--red */
+  --btn-disc: 74%;         /* tamaño del disco: súbelo si queda hueco junto al aro; bájalo si asoma azul por fuera */
+  --bg: #EEF5FF;
+  --card: #ffffff;
+  --text: #1B2A4A;
+  --muted: #7A8BAD;
+  --radius: 22px;
+  --shadow: 0 8px 24px rgba(47, 107, 255, 0.12);
+  --shadow-soft: 0 4px 14px rgba(47, 107, 255, 0.08);
+
+  /* Safe-areas del dispositivo (notch/status bar iOS+Android) y espacio que
+     ocupa el banner de AdMob abajo. --admob-banner-occupied lo actualiza
+     native.js en tiempo real; 0 en web / sin banner. */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --admob-banner-occupied: 0px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+[hidden] { display: none !important; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  font-weight: 200;
+  font-optical-sizing: auto;
+  /* Fondo PLANO en el azul de marca (el degradado se veía mal donde no
+     alcanzaba a desvanecerse — preferencia de Luis 2026-07-14). */
+  background: var(--brand-blue, #2F6BFF);
+  color: var(--text);
+  font-size: 18px;
+  line-height: 1.45;
+
+  /* App: la página NO scrollea a nivel navegador. El alto es fijo (viewport)
+     y el scroll vive dentro de las vistas (listas / calendario). */
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+
+  /* Deja espacio arriba para el notch/status bar (iconos de batería, señal,
+     hora) y abajo para el safe-area + el banner de AdMob. */
+  padding-top: var(--safe-top);
+  padding-bottom: calc(var(--safe-bottom) + var(--admob-banner-occupied));
+}
+
+.container {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 0 18px 80px;
+
+  /* Columna de alto fijo (= viewport): el hero arriba y el calendario ocupando
+     lo que quepa. Sin scroll propio: el que sobra se recorta desde JS
+     (measureViewsHeight) o scrollea dentro del calendario. */
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ---------- Hero ---------- */
+
+.hero {
+  padding: 36px 24px 2px;
+  text-align: center;
+  color: #fff;
+}
+
+.hero .logo {
+  width: 86px;
+  height: 86px;
+  border-radius: 24px;
+
+  box-shadow: 
+    0 20px 60px rgba(0, 0, 0, 0.08),
+    0 8px 20px rgba(0, 0, 0, 0.06);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Nombre del grupo: ligero y ancho (tracking amplio). El tamaño efectivo lo
+   fija header-split.css. Los nombres largos parten a otra línea en lugar de
+   salirse de la pantalla. */
+.hero h1 {
+  font-size: 2.15rem;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  padding-left: 0.14em;   /* compensa el tracking del último caracter (centrado) */
+  overflow-wrap: anywhere;
+}
+
+.subtitle { opacity: 0.92; margin-top: 4px; }
+
+ 
+
+/* ---------- Tarjetas normales ---------- */
+
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 24px 22px;
+  margin-bottom: 18px;
+  box-shadow: var(--shadow-soft);
+}
+
+/* ---------- Tarjeta de crear grupo: calendario largo top/mid/bottom ---------- */
+
+.calendar-dialog {
+  width: min(100%, 390px);
+  margin: 14px auto 24px;
+
+  background: none;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 0;
+  overflow: visible;
+
+  /* Sombra que hace flotar el calendario. drop-shadow (no box-shadow) para
+     que siga la silueta redondeada. MÁS SUAVE que antes: sobre el fondo azul
+     PLANO, el halo ancho y oscuro se veía como un "corte" vertical (banding);
+     el degradado viejo lo disimulaba. */
+  filter: drop-shadow(0 18px 32px rgba(6, 26, 82, 0.26));
+
+  /* El calendario se ajusta a su contenido (no se estira a toda la
+     pantalla) para que en móvil no quede gigante cuando aparece el
+     teclado. La altura real la define el min-height de .calendar-mid. */
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+
+  /* OJO: sin min-height: 0. Con él, el flex del .container encogía el BOX del
+     dialog por debajo de sus filas (top+mid+bottom) con el teclado abierto:
+     los botones flotantes (check/back), anclados al box, quedaban a MEDIA
+     tarjeta. La tarjeta no cambia de tamaño (decisión de diseño): lo que no
+     cabe queda tras el teclado y regresa al cerrarlo. */
+
+  position: relative;
+}
+
+.calendar-top,
+.calendar-mid,
+.calendar-bottom {
+  min-width: 0;
+}
+
+/* Estrella sobre la esquina superior derecha del calendario */
+.calendar-dialog::before {
+  content: "";
+  position: absolute;
+  top: 8%;
+  /* Cuelga hasta 28px fuera del calendario, pero nunca más allá del borde
+     de la pantalla: en móvil el margen del container es de solo 18px y la
+     estrella/spark se recortaba por la derecha. (100vw - 100%)/2 = margen
+     real hasta el borde cuando el dialog está centrado. */
+  right: calc(-1 * min(28px, (100vw - 100%) / 2));
+  width: 27%;
+  aspect-ratio: 382 / 354;
+  background: url('/star.png') center / contain no-repeat;
+  z-index: 3;
+  pointer-events: none;
+}
+
+/* Palomita sobre la esquina inferior derecha del calendario */
+.calendar-dialog::after {
+  content: "";
+  position: absolute;
+  bottom: -16px;
+  right: -14px;
+  width: 28%;
+  aspect-ratio: 1 / 1;
+  background: url('/check.png?v=2') center / contain no-repeat;
+  z-index: 3;
+  pointer-events: none;
+}
+
+/* Parte superior: argollas y cabecera. No se estira. */
+.calendar-top {
+  width: 100%;
+  aspect-ratio: 1289 / 430;
+  background: url('/top.png?v=2') center bottom / 100% auto no-repeat;
+  pointer-events: none;
+}
+
+/* Parte media: esta es la que se alarga todo lo posible. */
+.calendar-mid {
+  width: 100%;
+  min-height: 320px;
+
+  /*
+    OpciÃ³n limpia: estira mid.png verticalmente.
+    Si prefieres repetirla: cambia a repeat-y y background-size: 100% auto.
+  */
+  background: url('/mid.png?v=2') center center / 100% 100% no-repeat;
+
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+
+  /* El área azul de mid.png no está centrada en la imagen: va del
+     12.72% al 90.38% del ancho (marco izquierdo más ancho). Estos
+     paddings = borde azul real + 3% de margen igual en ambos lados,
+     para que inputs y botones queden simétricos dentro del azul. */
+  padding: 18px 12.6% 8px 15.7%;
+
+  position: relative;
+}
+
+/* Parte inferior: cierre redondeado. No se estira. */
+.calendar-bottom {
+  width: 100%;
+  aspect-ratio: 1289 / 211;
+  background: url('/bottom.png?v=2') center top / 100% auto no-repeat;
+  pointer-events: none;
+}
+
+/* Contenido dentro del calendario: llena el área azul (ya delimitada
+   por el padding de .calendar-mid) */
+.calendar-content {
+  width: 100%;
+  position: relative;
+  z-index: 2;
+  text-align: center;
+}
+
+/* Ajustes del contenido dentro del calendario */
+.calendar-dialog .big-emoji {
+  font-size: 2.2rem;
+  margin: 0 0 8px;
+}
+
+.calendar-dialog p {
+  color: var(--text);
+}
+
+.calendar-dialog .calendar-content > p {
+  max-width: 310px;
+  margin: 0 auto 10px;
+  font-weight: 700;
+  color: #1B2A4A;
+  text-align: center;
+}
+
+.calendar-dialog h2 {
+  color: #1B2A4A;
+}
+
+.calendar-dialog label {
+  color: #1B2A4A;
+  margin-top: 12px;
+  margin-bottom: 6px;
+}
+
+/* Inputs y botones como los "días" del icono del calendario:
+   cuadros planos azul claro (#A6C2FC, muestreado de icon-512.png),
+   y el blanco reservado para el día resaltado. */
+.calendar-dialog input[type="text"],
+.calendar-dialog input[type="date"],
+.calendar-dialog textarea {
+  background: #fff;
+  border: none;
+  border-radius: 16px;
+  color: var(--text);
+  /* Planos, sin sombra flotante. */
+  box-shadow: none;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+              box-shadow 0.3s ease;
+}
+
+.calendar-dialog input::placeholder,
+.calendar-dialog textarea::placeholder {
+  color: rgba(27, 42, 74, 0.55);
+}
+
+/* El botón principal es el día blanco resaltado del icono */
+.calendar-dialog .btn-primary {
+  margin-top: 4px;
+  border-radius: 16px;
+  background: #fff;
+  color: var(--primary);
+  font-weight: 800;
+  box-shadow:
+    0 26px 46px rgba(6, 26, 82, 0.50),
+    0 10px 18px rgba(6, 26, 82, 0.38);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.calendar-dialog .btn-primary:active {
+  transform: translateY(2px);
+  box-shadow:
+    0 14px 24px rgba(6, 26, 82, 0.42),
+    0 5px 10px rgba(6, 26, 82, 0.30);
+}
+
+.calendar-dialog .btn-soft {
+  background: #A6C2FC;
+  color: var(--text);
+  border-radius: 14px;
+}
+
+.calendar-dialog .share-box {
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 4px 12px rgba(16, 42, 102, 0.12);
+}
+
+/* ---------- Celebraciones prÃ³ximas ---------- */
+
+.celebrations {
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: var(--radius);
+  padding: 22px;
+  margin-bottom: 22px;
+  color: #fff;
+}
+
+.celebrations h2 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.celebrations h2 .star { color: var(--accent); font-size: 1.2rem; }
+
+/* Mini-tarjeta compacta: fecha (chip) a la izquierda, nombre + logro a la
+   derecha. Sin contador grande, sin botón, sin líneas divisorias. */
+.celebration-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.16);
+  border-radius: 12px;
+  padding: 7px 12px;
+  margin-bottom: 8px;
+  min-height: 50px;
+}
+
+.celebration-item:last-child { margin-bottom: 0; }
+
+.celeb-date {
+  flex: 0 0 auto;
+  min-width: 46px;
+  text-align: center;
+  font-weight: 800;
+  font-size: 0.82rem;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.20);
+  border-radius: 8px;
+  padding: 6px 8px;
+}
+
+.celeb-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;         /* permite truncar el nombre largo */
+  line-height: 1.18;
+}
+
+.celeb-name {
+  font-weight: 800;
+  font-size: 1rem;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.celeb-achv {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* ---------- Calendario de miembros ---------- */
+
+/* Nombre del grupo sobre la franja blanca de top.png */
+.calendar-top {
+  position: relative;
+}
+
+.calendar-top .calendar-title {
+  position: absolute;
+  /* El arte no está centrado en el PNG (marco izquierdo más ancho: el área
+     visible va del 12.72% al 90.38%). Insets asimétricos para que el texto
+     quede centrado respecto al calendario visible, no a la caja. */
+  left: 12.72%;
+  right: 9.62%;
+  bottom: 15%;
+  margin: 0;
+  text-align: center;
+  color: #1B2A4A;
+  font-size: 1.3rem;
+  font-weight: 500;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+/* Las filas de eventos van alineadas a la izquierda dentro del marco */
+.calendar-dialog #members-list {
+  width: 100%;
+  text-align: left;
+}
+
+/* ---------- Fila de compaÃ±ero ---------- */
+
+.member-row {
+  background: #C3D4F6;
+  border-radius: 14px;
+  padding: 8px 12px;
+  margin-bottom: 8px;
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #16305E;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 3px 8px rgba(16, 42, 102, 0.18);
+  transition: transform 0.08s ease;
+  position: relative;
+}
+
+.member-row.editable { cursor: pointer; }
+.member-row:active { transform: scale(0.98); }
+.member-row:last-child { margin-bottom: 0; }
+
+/* Chip de fecha corta del próximo hito (mismo lenguaje que las celebraciones) */
+.mr-date {
+  flex: 0 0 auto;
+  min-width: 46px;
+  text-align: center;
+  font-weight: 800;
+  font-size: 0.8rem;
+  color: var(--primary);
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 8px;
+  padding: 6px 8px;
+}
+
+.mr-info { display: flex; flex-direction: column; min-width: 0; line-height: 1.18; }
+
+.mr-name {
+  font-size: 1rem;
+  font-weight: 800;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mr-sub { font-size: 0.82rem; color: #44598A; }
+
+/* Título "Editar" del formulario inline */
+.member-name { font-size: 1.05rem; font-weight: 800; overflow-wrap: anywhere; }
+
+.member-row.today {
+  background: #fff;
+  box-shadow: 0 6px 16px rgba(16, 42, 102, 0.28);
+}
+
+.member-row.today .mr-sub {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.member-row.editing {
+  display: block;
+  background: #fff;
+}
+
+/* ---------- Botones ---------- */
+
+button {
+  font-family: inherit;
+  border: none;
+  cursor: pointer; 
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 15px;
+  border-radius: 20px; 
+  background-color: #a1bdf9;
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 200;
+  transition: transform 0.08s, box-shadow 0.08s;
+    box-shadow:
+    0 18px 28px rgba(0, 35, 130, 0.28),
+    0 8px 12px rgba(0, 35, 130, 0.18),
+    inset 0 1px 2px rgba(255, 255, 255, 0.55);
+}
+
+.btn-primary:active {
+  transform: scale(0.96);
+  box-shadow: 0 6px 12px rgba(47, 107, 255, 0.25);
+}
+
+.btn-soft {
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: #EDF3FF;
+  color: var(--primary);
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-top: 10px;
+}
+
+.btn-soft:active { transform: scale(0.97); }
+
+.btn-danger-soft {
+  padding: 12px 22px;
+  border-radius: 999px;
+  background: #FFF0F0;
+  color: #D24545;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.btn-row {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.btn-row button { margin-top: 0; flex: 1; }
+
+/* ---------- Formularios ---------- */
+
+label {
+  display: block;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 14px 0 8px;
+  text-align: left;
+}
+
+input[type="text"],
+input[type="date"],
+textarea {
+  width: 100%;
+  font-family: inherit;
+  font-size: 1.15rem;
+  padding: 16px;
+  border: 2px solid #DCE8FF;
+  border-radius: 16px;
+  background: #F7FAFF;
+  color: var(--text);
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  min-height: 58px;
+}
+
+input:focus { border-color: var(--secondary); background: #fff; }
+
+form .btn-primary,
+.form-actions { margin-top: 20px; }
+
+/* ---------- Compartir ---------- */
+
+.share-box {
+  word-break: break-all;
+  background: var(--bg);
+  border-radius: 16px;
+  padding: 16px;
+  margin: 14px 0 4px;
+  font-size: 1rem;
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.section-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  margin: 26px 4px 14px;
+}
+
+.hint { font-size: 0.95rem; color: var(--muted); margin-top: 10px; }
+
+.error {
+  color: #D24545;
+  font-weight: 600;
+  margin-top: 12px;
+  font-size: 1rem;
+  min-height: 1.2em;
+  text-align: center;
+}
+
+.empty {
+  color: #DCE8FF;
+  text-align: center;
+  padding: 30px 20px;
+  font-size: 1.1rem;
+  position: relative;
+}
+
+.container > .error { color: #FFE1E1; }
+
+a { color: var(--primary); font-weight: 700; text-decoration: none; }
+
+.center { text-align: center; }
+
+.big-emoji { font-size: 3rem; margin-bottom: 8px; }
+
+/* ---------- Ajustes para pantallas chicas ---------- */
+
+@media (max-width: 380px) {
+  .container {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .hero {
+    padding-top: 28px;
+  }
+
+  .hero h1 {
+    font-size: 1.5rem;
+  }
+
+  .calendar-dialog {
+    width: min(100%, 370px);
+  }
+
+  .btn-primary {
+    padding: 16px;
+    font-size: 1.08rem;
+  }
+}
+
+
+/* ---------- "Envíanos un comentario" ----------
+   Compartido por el home (liga al pie) y la página del grupo (entrada en el
+   panel "Mis grupos"). El formulario vive en un overlay (patrón .savekey):
+   ninguna de las dos pantallas scrollea. Pesos ligeros. */
+.feedback-entry {
+  width: 100%;
+  margin-top: 14px;
+  text-align: center;
+}
+
+.feedback-toggle {
+  border: none;
+  background: none;
+  padding: 8px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.72);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.feedback-toggle i { margin-right: 6px; opacity: 0.85; }
+
+.feedback {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: linear-gradient(160deg, #2F6BFF 0%, #1E51D6 100%);
+}
+.feedback[hidden] { display: none; }
+
+.feedback-card {
+  width: min(100%, 380px);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: center;
+  color: #fff;
+}
+.feedback-emoji { margin: 0; font-size: 3rem; }
+.feedback-title { margin: 0 0 6px; font-size: 1.4rem; font-weight: 500; }
+
+.feedback-card textarea,
+.feedback-card input {
+  min-width: 0;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 14px;
+  background: #fff;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.98rem;
+  font-weight: 400;
+}
+.feedback-card textarea { resize: none; min-height: 110px; }
+
+.feedback-send {
+  width: 100%;
+  min-height: 54px;
+  padding: 14px 18px;
+  border: none;
+  border-radius: 18px;
+  background: #fff;
+  color: #2F6BFF;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: transform 0.12s ease, opacity 0.15s ease;
+}
+.feedback-send:active { transform: scale(0.97); }
+.feedback-send:disabled { opacity: 0.45; cursor: default; }
+
+.feedback-close {
+  width: 100%;
+  min-height: 50px;
+  padding: 12px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 400;
+  cursor: pointer;
+  transition: transform 0.12s ease;
+}
+.feedback-close:active { transform: scale(0.97); }
+
+.feedback-done {
+  margin: 0;
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 400;
+}
+
+/* ---------- Reuniones semanales (.gmeet) ----------
+   Compartido por el editor de grupo (group.html, gedit) y el paso 1 del
+   crear (index.html). Horarios del grupo (día + hora): lista de los ya
+   agregados y una fila de alta con chips L-D + hora + botón "+". Pesos
+   ligeros, sin bold. */
+.gmeet { width: 100%; }
+
+/* Crear grupo (index, #group-meet): la lista de juntas NO estira la
+   tarjeta — scrollea por dentro con tope de lo que ocuparía el calendario;
+   la fila de alta (sticky) queda siempre visible al fondo. Sin barra, como
+   las demás listas. (En el gedit el scroll equivalente vive en #gedit-view.) */
+#group-meet {
+  max-height: min(340px, 52vh);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+#group-meet::-webkit-scrollbar { display: none; }
+
+/* Botoncito "🕒 Horario de juntas" bajo la información adicional: abre la
+   sección de reuniones en el lugar del calendario (la info se oculta, como
+   cuando se abre el calendario; el foco en el nombre la trae de vuelta). */
+.gmeet-open-btn {
+  display: block;
+  /* Única fuente del aire info→botón: las tarjetas de info de crear y del
+     gedit terminan sin margen abajo, así el botoncito queda IGUAL en las dos
+     páginas, a media altura del azul que queda bajo la info. (Margen inferior
+     negativo NO: la tarjeta bajita del gedit no lo cuenta y su overflow
+     hidden recortaba la base de la píldora.) */
+  margin: 14px auto 0;
+  padding: 9px 16px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 400;
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.15s ease;
+}
+.gmeet-open-btn:active { transform: scale(0.96); background: rgba(255, 255, 255, 0.24); }
+
+/* Prefijo .calendar-dialog: le gana a `.calendar-dialog p`, que si no pinta
+   el letrero en oscuro en vez de blanco. */
+.calendar-dialog .gmeet-title {
+  margin: 0 0 8px;
+  font-size: 1.05rem;
+  font-weight: 400;
+  color: #fff;
+  text-align: center;
+}
+
+.gmeet-list:not(:empty) { margin: 0 0 10px; }
+
+.gmeet-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  min-height: 42px;
+  margin: 0 0 8px;
+  padding: 8px 10px 8px 18px;
+
+  border-radius: 14px;
+  background: #fff;
+  color: var(--text);
+  font-size: 1rem;
+  font-weight: 400;
+}
+.gmeet-row:last-child { margin-bottom: 0; }
+
+.gmeet-del {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  color: #8aa0c8;
+  font-size: 1.05rem;
+  cursor: pointer;
+}
+.gmeet-del:active { background: #eef3fc; }
+
+/* Fila de alta (chips + hora + botón) fija al fondo del scroll que la
+   contenga (#gedit-view en group.html): siempre visible completa; la lista
+   de reuniones scrollea por detrás. El fondo azul sólido (mismo --brand-blue
+   del calendario) tapa las filas al pasar, y el box-shadow sangra el azul
+   por debajo del borde. */
+.gmeet-add {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  background: var(--brand-blue);
+  padding: 8px 0 10px;   /* aire bajo los días/hora al fondo del scroll */
+  box-shadow: 0 4px 0 var(--brand-blue);
+}
+
+.gmeet-days {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  margin: 0 0 10px;
+}
+
+.gmeet-day {
+  flex: 1 1 0;
+  min-width: 0;              /* que SIEMPRE quepan los 7 en el ancho del azul */
+  aspect-ratio: 1 / 1;
+  max-width: 36px;
+  padding: 0;
+  border: 1.5px solid rgba(255, 255, 255, 0.55);
+  border-radius: 50%;
+  background: none;
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 400;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.gmeet-day.is-active {
+  background: #fff;
+  border-color: #fff;
+  color: var(--brand-blue);
+}
+
+/* ---------- Selector de hora (.tpick, tpick.js) ----------
+   Reemplaza al <input type="time"> nativo (reloj oscuro del sistema, fuera
+   de la estética): horas 1-12 en dos renglones de chips redondos, minutos
+   :00/:15/:30/:45 y am/pm — mismo lenguaje que los chips de día L-D. */
+.tpick {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0 0 10px;
+}
+.tpick-row {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+}
+.tpick-chip {
+  flex: 1 1 0;
+  min-width: 0;
+  aspect-ratio: 1 / 1;
+  max-width: 36px;
+  padding: 0;
+  border: 1.5px solid rgba(255, 255, 255, 0.55);
+  border-radius: 50%;
+  background: none;
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 400;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.tpick-chip.is-active {
+  background: #fff;
+  border-color: #fff;
+  color: var(--brand-blue);
+}
+/* am/pm: pastillas (no círculos), un pelo más anchas. */
+.tpick-chip--ampm {
+  aspect-ratio: auto;
+  max-width: 52px;
+  min-height: 32px;
+  border-radius: 999px;
+  align-self: center;
+}
+.tpick-sep {
+  width: 1px;
+  align-self: stretch;
+  margin: 4px 4px;
+  background: rgba(255, 255, 255, 0.35);
+}
+
+/* ---------- Popup "agregar reunión" (.mpop, tpick.js DQCMeetPick) ----------
+   Panel azul con marco blanco (mismo lenguaje que el modal de confirmación):
+   chips de día L-D (multi-select) + selector de hora + Cancelar/Agregar. */
+.mpop-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(6, 26, 82, 0.55);
+}
+.mpop-overlay[hidden] { display: none; }
+
+.mpop-panel {
+  width: min(100%, 340px);
+  background: var(--brand-blue);
+  border: 7px solid #fff;
+  border-radius: 26px;
+  padding: 20px 18px 16px;
+  box-shadow: 0 24px 60px rgba(6, 26, 82, 0.45);
+}
+
+.mpop-days {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  margin: 0 0 12px;
+}
+
+.mpop-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+.mpop-btn {
+  flex: 1 1 0;
+  min-height: 46px;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 14px;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.mpop-btn:active { transform: scale(0.97); }
+.mpop-cancel { background: rgba(255, 255, 255, 0.16); color: #fff; }
+.mpop-cancel:active { background: rgba(255, 255, 255, 0.24); }
+.mpop-ok { background: #fff; color: var(--brand-blue); }
+.mpop-ok:active { background: #e9efff; }
+
+/* Agregar reunión: botón a lo ancho bajo la lista (abre el popup). */
+.gmeet-add-btn {
+  width: 100%;
+  min-height: 46px;
+  padding: 0;
+  border: none;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.22);
+  color: #fff;
+  font-size: 1.05rem;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+.gmeet-add-btn:active { transform: scale(0.93); }

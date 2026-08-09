@@ -1,0 +1,25 @@
+{
+  "name": "flecosybarbas",
+  "version": "0.1.0",
+  "description": "Flecos y Barbas — citas, regreso y memoria para peluqueros independientes. Un solo código, dos apps (flecos.mx / barbas.mx).",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "flecos": "BRAND=flecos node server.js",
+    "barbas": "BRAND=barbas PORT=3101 node server.js",
+    "test": "node --test",
+    "test:rapido": "node --test test/handles.test.js test/brand.test.js test/alta.test.js",
+    "test:navegador": "node --test test/navegador.test.js",
+    "test:instalar": "playwright install chromium"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.10.0",
+    "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "playwright": "^1.62.1"
+  }
+}

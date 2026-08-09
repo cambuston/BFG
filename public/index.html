@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>{{BRAND_NAME}}</title>
+  <meta name="theme-color" content="{{BRAND_COLOR}}">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+
+  <!-- Mismas hojas que Días que Cuentan, en el mismo orden. El look sale de
+       aquí; handle.css solo agrega las dos piezas nuevas (la caja del
+       identificador y la línea de estado). -->
+  <link rel="stylesheet" href="/fonts/fonts.css?v=1">
+  <link rel="stylesheet" href="/fontawesome/css/all.min.css?v=2">
+  <link rel="stylesheet" href="/styles.css?v=1">
+  <link rel="stylesheet" href="/header-split.css?v=1">
+  <link rel="stylesheet" href="/calendar-form.css?v=1">
+  <link rel="stylesheet" href="/calendar-colors.css?v=1">
+  <link rel="stylesheet" href="/handle.css?v=1">
+
+  <!-- La marca la incrusta el servidor (src/brand.js). Va ANTES de las hojas
+       que la usan para que Barbas nunca parpadee en el azul de Flecos. -->
+  <style>
+    :root {
+      --brand-blue: {{BRAND_COLOR}};
+      --primary: {{BRAND_COLOR}};
+      --secondary: {{BRAND_COLOR}};
+    }
+  </style>
+  <script>window.BRAND = {{BRAND_JSON}};</script>
+</head>
+<body>
+  <div class="container">
+
+    <div class="hero">
+      <!-- Logo provisional: tijeras en cuadro redondo, del color de la marca.
+           Cámbialo por el arte real cuando lo tengas (mismo tamaño). -->
+      <svg class="logo" viewBox="0 0 72 72" aria-hidden="true">
+        <rect width="72" height="72" rx="20" fill="#fff"/>
+        <g fill="none" stroke="var(--brand-blue)" stroke-width="4"
+           stroke-linecap="round" stroke-linejoin="round">
+          <path d="M24 20 L48 50"/>
+          <path d="M48 20 L24 50"/>
+          <circle cx="22" cy="54" r="6"/>
+          <circle cx="50" cy="54" r="6"/>
+        </g>
+      </svg>
+      <h1>{{BRAND_NAME}}</h1>
+      <p class="subtitle">{{BRAND_TAGLINE}}</p>
+    </div>
+
+    <div class="card center calendar-dialog" id="create-card">
+      <div class="calendar-top"></div>
+
+      <div class="calendar-mid">
+        <div class="calendar-content">
+          <div class="steps" id="steps">
+
+            <!-- ============ PASO 1: elegir identificador ============ -->
+            <section class="step" data-step="1">
+              <p class="step-prompt">¿Cuál va a ser tu dirección?</p>
+
+              <div class="handle-box" id="handle-box">
+                <span class="handle-prefix">{{BRAND_DOMAIN}}/</span>
+                <input type="text" id="handle" maxlength="30"
+                       placeholder="juan" autocomplete="off" autocapitalize="none"
+                       autocorrect="off" spellcheck="false"
+                       enterkeyhint="go" data-lpignore="true">
+              </div>
+
+              <p class="handle-status" id="handle-status"></p>
+
+              <button type="button" class="btn-primary" id="handle-go" disabled>
+                Escribe tu dirección
+              </button>
+            </section>
+
+            <!-- ============ PASO 2: guardar la cuenta ============ -->
+            <section class="step" data-step="2" hidden>
+              <p class="step-prompt">Guarda tu cuenta</p>
+
+              <p class="handle-echo" id="handle-echo"></p>
+
+              <button type="button" class="welcome-option" data-provider="google">
+                <i class="fa-brands fa-google"></i> <span>Continuar con Google</span>
+              </button>
+              <button type="button" class="welcome-option" data-provider="apple">
+                <i class="fa-brands fa-apple"></i> <span>Continuar con Apple</span>
+              </button>
+              <button type="button" class="welcome-option" data-provider="facebook">
+                <i class="fa-brands fa-facebook"></i> <span>Continuar con Facebook</span>
+              </button>
+
+              <button type="button" class="handle-back" id="handle-back">
+                <i class="fa-light fa-chevron-left"></i> Cambiar mi dirección
+              </button>
+            </section>
+
+            <!-- ============ LISTO ============ -->
+            <section class="step" data-step="3" hidden>
+              <p class="big-emoji">✂️</p>
+              <p class="step-prompt" id="done-title">Ya es tuya</p>
+              <div class="share-box" id="done-url"></div>
+              <p class="handle-note">
+                Lo siguiente será tu horario, tus servicios y tus clientes.
+              </p>
+            </section>
+
+          </div>
+
+          <p class="error" id="error"></p>
+        </div>
+      </div>
+
+      <div class="calendar-bottom"></div>
+    </div>
+
+  </div>
+
+  <script src="/app.js?v=1"></script>
+</body>
+</html>
