@@ -10,7 +10,13 @@ El look es el de **Días que Cuentan**, copiado tal cual: mismo fondo azul plano
 mismo calendario de argollas, misma tipografía (Inter 200), mismos botones,
 mismos tamaños. Las hojas de estilo son literalmente las mismas
 (`styles.css`, `header-split.css`, `calendar-form.css`, `calendar-colors.css`);
-`handle.css`, `negocio.css` y `mi.css` solo agregan lo que allá no existía.
+`handle.css`, `negocio.css`, `mi.css` y `marco.css` solo agregan lo que allá no
+existía.
+
+**El marco del calendario es CSS, no imágenes.** Las argollas, el papel y el
+cierre de abajo se dibujan con `border-radius` y degradados en
+[`marco.css`](public/marco.css) — antes eran PNG. Ver
+[El marco, sin imágenes](#el-marco-sin-imágenes).
 
 ## Correr
 
@@ -312,8 +318,9 @@ public/index.html + app.js       El alta
 public/negocio.html + negocio.js La página pública y reservar
 public/mi.html + mi.js           Las cuatro pestañas
 public/handle.css                ┐
-public/negocio.css               ├ lo único nuevo de CSS
-public/mi.css                    ┘
+public/negocio.css               │
+public/mi.css                    ├ lo único nuevo de CSS
+public/marco.css                 ┘ ← el marco del calendario, sin PNG
 public/styles.css                ┐
 public/header-split.css          ├ copiados de Días que Cuentan, sin tocar
 public/calendar-*.css            ┘
@@ -331,9 +338,35 @@ ideas.txt                 Notas originales del producto
 - **Supabase de verdad.** El código está y probado contra un Supabase falso,
   pero nadie ha configurado un proyecto real todavía.
 
+## El marco, sin imágenes
+
+Las puntas del calendario —las argollas de arriba y el cierre de abajo— eran
+`top-frame.png` y `bottom-frame.png`, más dos máscaras para recolorear el azul.
+El tramo de en medio ya era CSS puro; [`marco.css`](public/marco.css) termina
+el trabajo.
+
+Qué se gana:
+
+- **145 KB menos que bajar**, y dos peticiones menos.
+- **Se acabó el halo azul horneado** alrededor de las argollas. En Flecos no se
+  notaba porque el fondo es azul; en Barbas (verde) se veía un arco azul, y era
+  el pendiente conocido de este README. Ahora el color sale de `--brand-blue`:
+  una marca nueva se ve bien sin volver a exportar arte.
+- **Nítido a cualquier tamaño**, sin @2x ni @3x.
+
+No está dibujado a ojo. Los PNG se midieron leyendo su canal alfa pixel por
+pixel (canvas + `getImageData`), y `marco.css` está escrito en las coordenadas
+reales del arte gracias a `--px: calc(100cqw / 1289)`, que vale exactamente un
+pixel de la imagen original. Así `calc(163 * var(--px))` **es** el radio del
+arte, y todo escala solo.
+
+Comprobado midiendo los bordes de lo pintado en los dos modos: coinciden dentro
+de 1 px (antialiasing). `marco.css` va al final y pisa a `calendar-colors.css`,
+así que **quitar su `<link>` devuelve el look de imágenes** sin tocar nada más
+— por eso los PNG viejos siguen en `public/`.
+
 ## Pendiente conocido
 
-El arte del calendario (`top-frame.png`) trae un halo azul horneado alrededor
-de las argollas. En Flecos no se nota porque el fondo es azul; en Barbas
-(verde) se alcanza a ver un arco azul. Se arregla re-exportando ese PNG con el
-borde transparente, o dejando a Barbas en un color de la familia azul.
+En la pantalla del alta, la palomita decorativa de la esquina inferior derecha
+(`check.png`) no se ve; en la página pública sí. Viene de antes de todo esto y
+vive en las hojas copiadas de Días que Cuentan, que no se tocan.

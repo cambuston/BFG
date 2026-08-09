@@ -1,0 +1,217 @@
+/* ===========================================================================
+   EL MARCO DEL CALENDARIO, SIN IMÁGENES
+   ===========================================================================
+
+   Antes las puntas del calendario (las argollas de arriba y el cierre de
+   abajo) eran PNG: top-frame.png y bottom-frame.png, más dos máscaras
+   (top-sil.png, bottom-sil.png) para recolorear el azul. El tramo de en medio
+   ya era CSS puro desde antes; esto termina el trabajo.
+
+   Qué se gana:
+
+     · 145 KB menos que bajar, y dos peticiones menos.
+     · Se acabó el halo azul horneado alrededor de las argollas, que en Barbas
+       (verde) se veía como un arco azul. Era el "pendiente conocido" del
+       README. Ahora el color sale de --brand-blue y punto: cualquier marca
+       nueva se ve bien sin volver a exportar arte.
+     · Nítido en cualquier pantalla y a cualquier tamaño, sin @2x ni @3x.
+
+   -------------------------------------------------------------------------
+   CÓMO ESTÁ MEDIDO
+   -------------------------------------------------------------------------
+
+   No está dibujado a ojo. Los PNG originales se midieron leyendo su canal
+   alfa pixel por pixel (canvas + getImageData), y todos los números de abajo
+   son las coordenadas reales del arte, en el espacio de la imagen original
+   de 1289 px de ancho:
+
+     carta (el papel)     x 114 → 1217      radio arriba 163, abajo 145
+     página azul interior x 163 → 1165      radio arriba  50, abajo 100
+     argolla izquierda    centro x 390.5    argolla derecha centro x 938
+     cápsula              103 de ancho, 233 de alto
+     hueco                163 × 150, centro 74 px bajo la cápsula
+
+   Para poder escribir eso tal cual, `--px` vale exactamente un pixel de la
+   imagen original: `--px: calc(100cqw / 1289)`. Así `calc(163 * var(--px))`
+   ES el radio del arte, y todo escala solo con el ancho del calendario.
+   (`cqw` = 1% del ancho del contenedor; por eso el .calendar-dialog declara
+   `container-type: inline-size`.)
+
+   -------------------------------------------------------------------------
+   ESTA HOJA VA AL FINAL Y PISA A calendar-colors.css
+   -------------------------------------------------------------------------
+
+   calendar-colors.css y styles.css son copias literales de Días que Cuentan y
+   NO se tocan (ver CLAUDE.md). Lo que hace este archivo es apagar sus capas
+   de PNG y dibujar encima. Quitar el <link> de marco.css devuelve el look de
+   imágenes tal como estaba, sin tocar nada más.
+
+   Las capas, de abajo hacia arriba:
+
+     ::before   la carta blanca (el papel)
+     ::after    la página azul de dentro
+     .argolla   ::before el hueco · ::after la cápsula
+   ======================================================================== */
+
+.calendar-dialog {
+  /* De aquí sale cqw. Sin esto, --px no vale nada. */
+  container-type: inline-size;
+}
+
+.calendar-top,
+.calendar-mid,
+.calendar-bottom {
+  --px: calc(100cqw / 1289);
+}
+
+/* --- Se apagan las capas de imagen de calendar-colors.css --- */
+.calendar-top,
+.calendar-bottom {
+  background: none;
+}
+
+.calendar-top::before,
+.calendar-top::after,
+.calendar-bottom::before,
+.calendar-bottom::after {
+  content: "";
+  position: absolute;
+  /* Las máscaras y los PNG de marco ya no pintan nada. */
+  -webkit-mask: none;
+          mask: none;
+  background: none;
+  inset: auto;
+}
+
+/* ---------------------------------------------------------------------------
+   ARRIBA
+   ------------------------------------------------------------------------ */
+
+/* La carta. Los bordes izquierdo y derecho son LOS MISMOS valores que usa
+   .calendar-mid en calendar-colors.css (8.84% / 5.51%): si se separan, la
+   costura entre las dos piezas se nota. */
+.calendar-top::before {
+  left: 8.84%;
+  right: 5.51%;
+  top: calc(129 * var(--px));
+  bottom: 0;
+  background: #FAFAFC;
+  border-radius: calc(163 * var(--px)) calc(163 * var(--px)) 0 0;
+  z-index: 1;
+}
+
+/* La página azul de dentro. Estos porcentajes son a dónde llegan las paradas
+   del degradado de .calendar-mid (4.44% y 95.2% de la carta), ya convertidas
+   al ancho total — otra vez, para que la costura no se mueva. */
+.calendar-top::after {
+  left: 12.643%;
+  right: 9.621%;
+  top: calc(385 * var(--px));
+  bottom: -1px;                       /* 1px de solape: mata la costura sub-pixel */
+  background: var(--brand-blue);
+  border-radius: calc(50 * var(--px)) calc(50 * var(--px)) 0 0;
+  z-index: 2;
+}
+
+/* --- Las argollas --- */
+
+.argolla {
+  position: absolute;
+  top: calc(34 * var(--px));
+  width: calc(163 * var(--px));       /* el ancho del hueco, que es el más ancho */
+  height: calc(274 * var(--px));      /* de la punta de la cápsula al fondo del hueco */
+  z-index: 3;
+  pointer-events: none;
+}
+
+/* Centro real de cada argolla en el arte: 390.5 y 938. Se resta medio hueco
+   (81.5) para dar con el borde izquierdo de la caja. */
+.argolla:nth-of-type(1) { left: calc(309 * var(--px)); }
+.argolla:nth-of-type(2) { left: calc(856.5 * var(--px)); }
+
+/* El hueco: la perforación por donde pasa la argolla. Es del color de la
+   marca —se ve el fondo a través del papel— con una sombra interior que le da
+   el grosor del papel. */
+.argolla::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(124 * var(--px));
+  height: calc(150 * var(--px));
+  border-radius: 50%;
+  background: var(--brand-blue);
+  box-shadow: inset 0 calc(4 * var(--px)) calc(11 * var(--px)) rgba(6, 26, 82, 0.42);
+  z-index: 1;
+}
+
+/* La cápsula.
+ *
+ * No es un degradado diagonal: es un CILINDRO. Se muestreó el PNG a lo ancho
+ * y a lo largo, y sale así:
+ *
+ *   a lo ancho   filo oscuro (201,199,210) · blanco amplio del 5% al 45% ·
+ *                sombra que baja hasta (211,216,238) al 76% · un reflejo
+ *                que vuelve a subir · filo oscuro (169,171,194)
+ *   a lo largo   plano y blanco hasta el 68% · se oscurece hasta
+ *                (184,187,212) al 91% · y un brillo en el borde de abajo
+ *
+ * Por eso son dos capas y no un `linear-gradient` de 160°: el primer intento
+ * fue diagonal y dejaba toda la mitad de abajo grisácea.
+ */
+.argolla::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: calc(30 * var(--px));
+  width: calc(103 * var(--px));
+  height: calc(233 * var(--px));
+  border-radius: 999px;
+  background:
+    /* Oscurecido de la punta de abajo, con su reflejo en el filo */
+    linear-gradient(to bottom,
+        rgba(255, 255, 255, 0) 68%,
+        rgba(150, 152, 190, 0.26) 80%,
+        rgba(118, 122, 164, 0.56) 91%,
+        rgba(150, 158, 205, 0.28) 100%),
+    /* El cilindro, a lo ancho */
+    linear-gradient(to right,
+        #C9C7D2 0%,
+        #FDFDFD 5%,
+        #FCFCFD 42%,
+        #F3F2FB 52%,
+        #E3E6F9 64%,
+        #D3D8EE 76%,
+        #DCE2F8 93%,
+        #A9ABC2 100%);
+  /* Sombra sobre el papel */
+  box-shadow: calc(2 * var(--px)) calc(7 * var(--px)) calc(13 * var(--px)) rgba(6, 26, 82, 0.30);
+  z-index: 2;
+}
+
+/* ---------------------------------------------------------------------------
+   ABAJO
+   ------------------------------------------------------------------------ */
+
+.calendar-bottom::before {
+  left: 8.84%;
+  right: 5.51%;
+  top: -1px;
+  bottom: calc(58 * var(--px));
+  background: #FAFAFC;
+  border-radius: 0 0 calc(145 * var(--px)) calc(145 * var(--px));
+  z-index: 1;
+}
+
+.calendar-bottom::after {
+  left: 12.643%;
+  right: 9.621%;
+  top: -1px;
+  bottom: calc(107 * var(--px));
+  background: var(--brand-blue);
+  border-radius: 0 0 calc(100 * var(--px)) calc(100 * var(--px));
+  z-index: 2;
+}
+
+/* El título de la cabecera, si lo hay, por encima de todas las capas. */
+.calendar-top .calendar-title { z-index: 4; }

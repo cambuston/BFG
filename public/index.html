@@ -17,6 +17,7 @@
   <link rel="stylesheet" href="/calendar-form.css?v=1">
   <link rel="stylesheet" href="/calendar-colors.css?v=1">
   <link rel="stylesheet" href="/handle.css?v=1">
+  <link rel="stylesheet" href="/marco.css?v=1">
 
   <!-- La marca la incrusta el servidor (src/brand.js). Va ANTES de las hojas
        que la usan para que Barbas nunca parpadee en el azul de Flecos. -->
@@ -50,7 +51,10 @@
     </div>
 
     <div class="card center calendar-dialog" id="create-card">
-      <div class="calendar-top"></div>
+      <div class="calendar-top" aria-hidden="true">
+        <span class="argolla"></span>
+        <span class="argolla"></span>
+      </div>
 
       <div class="calendar-mid">
         <div class="calendar-content">
