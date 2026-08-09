@@ -16,3 +16,6 @@ test/screenshots/
 # settings.local.json no (preferencias personales de cada máquina).
 .claude/settings.local.json
 .DS_Store
+
+# Muestras de color: las regenera `node colores/ver.js`
+colores/muestras/
