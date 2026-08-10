@@ -2,7 +2,7 @@ const path = require('path');
 const fs = require('fs');
 const express = require('express');
 
-const { brandFor, BRANDS, ENV_BRAND } = require('./src/brand');
+const { brandFor, BRANDS, ENV_BRAND, variablesCss } = require('./src/brand');
 const handlesRoutes = require('./src/handles.routes');
 const miRoutes = require('./src/mi.routes');
 const publicoRoutes = require('./src/publico.routes');
@@ -68,6 +68,11 @@ function render(archivo, brand, extra = {}) {
     BRAND_NAME: brand.name,
     BRAND_DOMAIN: brand.domain,
     BRAND_TAGLINE: brand.tagline,
+    // El tema entero, listo para meter dentro de :root { … }. Va incrustado y
+    // no en una hoja aparte para que Barbas no parpadee en el azul de Flecos
+    // mientras carga el CSS.
+    BRAND_TEMA: Object.entries(variablesCss(brand))
+      .map(([k, v]) => `${k}:${v}`).join(';'),
     ...extra,
   };
   return html.replace(/\{\{(\w+)\}\}/g, (todo, clave) =>

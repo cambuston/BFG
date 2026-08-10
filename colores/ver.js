@@ -1,8 +1,9 @@
 // Prueba colores de marca SIN tocar nada del código que corre.
 //
-//   node colores/ver.js                 todos los de paleta.js
-//   node colores/ver.js "#9F1239"       uno suelto
-//   node colores/ver.js "#9F1239" "#334155" …
+//   node colores/ver.js                       todos los de paleta.js
+//   node colores/ver.js "#9F1239"             un color suelto
+//   node colores/ver.js --tema flecosMaqueta  un TEMA completo de temas.js
+//   node colores/ver.js --temas               todos los temas
 //
 // Levanta su propio servidor con una base de usar y tirar, da de alta un
 // negocio de ejemplo, y pinta cada color en las dos pantallas que importan:
@@ -23,6 +24,7 @@ const { spawn } = require('node:child_process');
 const { chromium } = require('playwright');
 
 const paleta = require('./paleta');
+const temas = require('./temas');
 
 const RAIZ = path.join(__dirname, '..');
 const SALIDA = path.join(__dirname, 'muestras');
@@ -116,11 +118,41 @@ function pide(base, ruta, cuerpo) {
 
 // ---------------------------------------------------------------------------
 
+// Un tema completo se pinta con las MISMAS variables que incrusta el
+// servidor (src/brand.js), así que lo que se ve es lo que se vería de verdad.
+function cssDeTema(t) {
+  const v = {
+    '--fondo': t.fondo, '--tinta-fondo': t.tintaFondo, '--papel': t.papel,
+    '--superficie': t.superficie, '--tinta': t.tinta, '--acento': t.acento,
+    '--logo': t.logo, '--text': t.texto || '#1B2A4A',
+    '--sombra': t.sombra, '--sombra-accion': t.sombraAccion || '0 35 130',
+    '--herraje': `var(--herraje-${t.herraje || 'plata'})`,
+    '--brand-blue': t.superficie, '--primary': t.acento, '--secondary': t.acento,
+  };
+  return ':root{' + Object.entries(v).map(([k, x]) => `${k}:${x}!important`).join(';') + '}';
+}
+
 async function main() {
-  const pedidos = process.argv.slice(2);
-  const lista = pedidos.length
-    ? pedidos.map((c, i) => ({ id: `color-${i + 1}`, nombre: c, color: c, nota: '' }))
-    : [...paleta.actuales, ...paleta.candidatos];
+  const args = process.argv.slice(2);
+
+  let lista;
+  if (args[0] === '--temas' || args[0] === '--tema') {
+    const cuales = args[0] === '--temas' ? Object.keys(temas) : args.slice(1);
+    const faltan = cuales.filter((n) => !temas[n]);
+    if (!cuales.length || faltan.length) {
+      console.error('Temas que no conozco:', faltan.join(', ') || '(ninguno)');
+      console.error('Hay:', Object.keys(temas).join(', '));
+      process.exit(1);
+    }
+    lista = cuales.map((n) => ({
+      id: n, nombre: n, color: temas[n].superficie, nota: 'tema completo',
+      css: cssDeTema(temas[n]),
+    }));
+  } else if (args.length) {
+    lista = args.map((c, i) => ({ id: `color-${i + 1}`, nombre: c, color: c, nota: '' }));
+  } else {
+    lista = [...paleta.actuales, ...paleta.candidatos];
+  }
 
   const malos = lista.filter((c) => !aRgb(c.color));
   if (malos.length) {
@@ -150,7 +182,11 @@ async function main() {
     const page = await ctx.newPage();
 
     // El mismo mecanismo que usa el servidor: pisar las variables de :root.
-    const css = `:root{--brand-blue:${c.color}!important;--primary:${c.color}!important;--secondary:${c.color}!important}`;
+    // Con --tema viene el juego completo; con un color suelto, solo el color.
+    const css = c.css
+      || `:root{--fondo:${c.color}!important;--superficie:${c.color}!important;`
+         + `--acento:${c.color}!important;--brand-blue:${c.color}!important;`
+         + `--primary:${c.color}!important;--secondary:${c.color}!important}`;
 
     const tiros = {};
     for (const [nombre, ruta] of [['alta', '/'], ['publica', '/juan']]) {

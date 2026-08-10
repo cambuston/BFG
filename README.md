@@ -4,7 +4,13 @@ Citas, regreso y memoria para peluqueros y barberos independientes.
 
 **Un solo código, dos apps.** `flecos.mx` y `barbas.mx` son el mismo programa
 con distinta marca. Lo único que cambia entre las dos vive en
-[`src/brand.js`](src/brand.js): nombre, dominio y color. Nada más.
+[`src/brand.js`](src/brand.js): nombre, dominio y **tema**. Nada más.
+
+Una marca es un `color`, y opcionalmente un `tema` de once piezas (fondo,
+papel, superficie, tinta, acento, logo, sombras, herraje…). Lo que el tema no
+diga se deduce del color. Cambiar el look entero —incluido pasar a un fondo
+crema con argollas de latón— es rellenar ese objeto: no se toca ni una hoja de
+estilo. Hay temas listos en [`colores/temas.js`](colores/temas.js).
 
 El look es el de **Días que Cuentan**, copiado tal cual: mismo fondo azul plano,
 mismo calendario de argollas, misma tipografía (Inter 200), mismos botones,

@@ -17,15 +17,13 @@
   <link rel="stylesheet" href="/calendar-colors.css?v=1">
   <link rel="stylesheet" href="/handle.css?v=1">
   <link rel="stylesheet" href="/marco.css?v=1">
+  <link rel="stylesheet" href="/tema.css?v=1">
   <link rel="stylesheet" href="/negocio.css?v=1">
 
-  <style>
-    :root {
-      --brand-blue: {{BRAND_COLOR}};
-      --primary: {{BRAND_COLOR}};
-      --secondary: {{BRAND_COLOR}};
-    }
-  </style>
+  <!-- El tema de la marca, incrustado por el servidor (src/brand.js). Va
+       ANTES de que corra el JavaScript para que Barbas no parpadee en el azul
+       de Flecos. -->
+  <style>:root { {{BRAND_TEMA}} }</style>
   <script>
     window.BRAND = {{BRAND_JSON}};
     window.HANDLE = "{{HANDLE}}";
@@ -36,8 +34,8 @@
 
     <div class="hero">
       <svg class="logo" viewBox="0 0 72 72" aria-hidden="true">
-        <rect width="72" height="72" rx="20" fill="#fff"/>
-        <g fill="none" stroke="var(--brand-blue)" stroke-width="4"
+        <rect class="fondo" width="72" height="72" rx="20" fill="#fff"/>
+        <g class="trazo" fill="none" stroke="var(--brand-blue)" stroke-width="4"
            stroke-linecap="round" stroke-linejoin="round">
           <path d="M24 20 L48 50"/>
           <path d="M48 20 L24 50"/>

@@ -1,0 +1,174 @@
+/* ===========================================================================
+   EL TEMA
+   ===========================================================================
+
+   Hasta aquí, una marca era UN COLOR y todo daba por hecho que encima iba
+   texto blanco. Esta hoja conecta las piezas del tema (ver src/brand.js) con
+   los sitios que las usan, y de paso tapa las FUGAS: los azules escritos a
+   mano que no seguían a la marca.
+
+   El servidor incrusta las variables en :root antes de que corra el
+   JavaScript. Lo que no sea `--brand-blue` / `--primary` / `--secondary` es
+   nombre nuevo:
+
+     --fondo  --tinta-fondo  --papel  --superficie  --tinta  --acento
+     --sombra  --herraje
+
+   -------------------------------------------------------------------------
+   ESTA HOJA NO CAMBIA CÓMO SE VE LA APP
+   -------------------------------------------------------------------------
+
+   Con los temas de hoy (que no traen `tema`, así que todo se deduce de
+   `color`), cada regla de aquí pinta EXACTAMENTE el mismo valor que estaba
+   escrito a mano antes. Es un cambio de fontanería, no de aspecto: hay una
+   prueba que compara pixel a pixel contra el commit anterior.
+
+   Lo que se gana es que un tema claro —fondo crema, letra oscura, herraje de
+   latón— pase a ser cuestión de rellenar `tema` en src/brand.js.
+   ======================================================================== */
+
+/* ---------------------------------------------------------------------------
+   Los dos herrajes
+   ---------------------------------------------------------------------------
+   No son colores sino degradados de ocho paradas, así que viven aquí enteros
+   y src/brand.js solo escoge cuál con `--herraje: var(--herraje-plata)`.
+
+   La plata sale de muestrear el PNG original (ver marco.css). El latón es el
+   mismo cilindro con la paleta corrida a oro viejo. */
+:root {
+  --herraje-plata:
+    linear-gradient(to bottom,
+        rgba(255, 255, 255, 0) 68%,
+        rgba(150, 152, 190, 0.26) 80%,
+        rgba(118, 122, 164, 0.56) 91%,
+        rgba(150, 158, 205, 0.28) 100%),
+    linear-gradient(to right,
+        #C9C7D2 0%, #FDFDFD 5%, #FCFCFD 42%, #F3F2FB 52%,
+        #E3E6F9 64%, #D3D8EE 76%, #DCE2F8 93%, #A9ABC2 100%);
+
+  --herraje-laton:
+    linear-gradient(to bottom,
+        rgba(255, 255, 255, 0) 66%,
+        rgba(90, 62, 20, 0.34) 82%,
+        rgba(60, 40, 10, 0.62) 93%,
+        rgba(190, 150, 80, 0.35) 100%),
+    linear-gradient(to right,
+        #6E5320 0%, #E8C878 8%, #FBEFC9 26%, #E3BE6E 52%,
+        #B58B3C 74%, #D9B064 90%, #6B4F1E 100%);
+}
+
+/* ---------------------------------------------------------------------------
+   Fondo y superficie: hasta hoy eran el mismo color, y por eso styles.css
+   pinta el body con --brand-blue. Son cosas distintas: el fondo es la
+   pantalla, la superficie es la página de dentro del calendario. En un tema
+   claro el fondo es crema y la superficie verde salvia.
+   ------------------------------------------------------------------------ */
+body { background: var(--fondo); }
+
+/* El agujero de la argolla deja ver el FONDO a través del papel, no la
+   superficie. Con los temas de hoy da igual porque son el mismo color. */
+.argolla::before { background: var(--fondo); }
+
+/* El papel del calendario. Antes era #FAFAFC escrito en tres sitios. */
+.calendar-top::before,
+.calendar-bottom::before { background: var(--papel); }
+
+.calendar-mid::before {
+  background: linear-gradient(to right,
+      var(--papel) 0 4.44%,
+      var(--superficie) 4.44% 95.2%,
+      var(--papel) 95.2% 100%);
+}
+
+/* El herraje. */
+.argolla::after { background: var(--herraje); }
+
+/* ---------------------------------------------------------------------------
+   Tinta
+   ------------------------------------------------------------------------ */
+
+/* Encima del FONDO va la cabecera, y nada más. Conserva su opacidad de
+   siempre (la leyenda iba al 92%). */
+.hero h1 { color: rgb(var(--tinta-fondo)); }
+.hero .subtitle { color: rgb(var(--tinta-fondo) / 0.92); opacity: 1; }
+
+/* Encima de la SUPERFICIE va todo lo de dentro del calendario. En las hojas
+   nuevas (handle.css, negocio.css, mi.css) ya está puesto directamente con
+   `rgb(var(--tinta) / …)`, respetando la opacidad de cada uno.
+
+   Aquí solo van los que viven en las hojas COPIADAS de Días que Cuentan, que
+   no se tocan: son los que nuestras páginas usan de verdad. */
+.calendar-dialog .step-prompt,
+.calendar-dialog .cal-month,
+.calendar-dialog .cal-selected { color: rgb(var(--tinta)); }
+
+.welcome-option { color: rgb(var(--tinta)); }
+.welcome-option i { opacity: 0.9; }
+
+/* ---------------------------------------------------------------------------
+   Las fugas
+   ---------------------------------------------------------------------------
+   Azules que estaban escritos a mano y no seguían a la marca. Con los temas
+   de hoy pintan el mismo color de siempre; con un tema claro, dejan de cantar.
+   ------------------------------------------------------------------------ */
+
+/* FUGA 1 — El logo. Era un cuadro blanco con las tijeras en --brand-blue, así
+   que en un tema crema se quedaba blanco nuclear con tijeras azules.
+
+   `--logo` y `--papel` son dos blancos DISTINTOS: el logo es blanco puro y el
+   papel del calendario es #FAFAFC. Se intentó usar `--papel` para los dos y la
+   comparación pixel a pixel lo cazó. */
+.hero .logo .fondo { fill: var(--logo); }
+.hero .logo .trazo { stroke: var(--acento); }
+
+/* FUGA 2 — Las sombras. Eran un azul marino fijo (rgba(6,26,82,…)); sobre
+   crema se veían azuladas.
+
+   OJO con las opacidades: cada sombra lleva la suya (0.60 y 0.35 en la
+   cabecera, 0.26 en el calendario) y hay que respetarlas una por una. Por eso
+   el token es la TERNA RGB y el alfa se pone aquí: si el token trajera el alfa
+   dentro, las tres se aplanarían en una y el look cambiaría. */
+.hero {
+  filter:
+    drop-shadow(0 6px 8px rgb(var(--sombra) / 0.60))
+    drop-shadow(0 22px 30px rgb(var(--sombra) / 0.35));
+}
+
+.calendar-dialog { filter: drop-shadow(0 18px 32px rgb(var(--sombra) / 0.26)); }
+
+/* FUGA 3 — La sombra del botón principal. Salió al aplicar la maqueta de
+   verdad: es un azul marino propio (0 35 130), distinto al de las demás
+   sombras, y sobre un fondo cálido se veía frío. Cada capa conserva su
+   opacidad, igual que con --sombra. */
+.btn-primary {
+  box-shadow:
+    0 18px 28px rgb(var(--sombra-accion) / 0.28),
+    0 8px 12px rgb(var(--sombra-accion) / 0.18),
+    inset 0 1px 2px rgba(255, 255, 255, 0.55);
+}
+
+/* `--acento` es un hex, no una terna, así que aquí no sirve `rgb(… / .25)`:
+   se mezcla con transparente, que da el mismo resultado.
+   OJO: esto SÍ cambia algo. La sombra de pulsado estaba escrita con el azul de
+   Flecos (rgba(47,107,255,.25)), así que en Barbas el botón daba un destello
+   AZUL sobre verde. Ahora cada marca destella con el suyo. Es el único cambio
+   visible de todo este paso, y solo dura lo que dura el dedo encima. */
+.btn-primary:active {
+  box-shadow: 0 6px 12px color-mix(in srgb, var(--acento) 25%, transparent);
+}
+
+/* FUGA 4 — El texto del hueco elegido, que se pintaba con --brand-blue (la
+   superficie) sobre blanco. Va con el acento, que es lo que se lee sobre
+   blanco. */
+.hora-btn:active { color: var(--acento); }
+
+/* LA FUGA QUE QUEDA VIVA — la palomita (check.png).
+   
+   Sigue siendo un PNG con el azul horneado, y en un tema vino o tabaco va a
+   cantar. NO se arregla aquí a propósito: teñirla con `mask` la dejaría de un
+   solo color plano y perdería el disco blanco y el volumen, o sea que
+   CAMBIARÍA cómo se ve hoy — justo lo que este paso promete no hacer.
+   
+   Se arregla redibujándola en CSS, como se hizo con el marco del calendario
+   (public/marco.css cuenta cómo se midió el arte). Es un trabajo aparte y va
+   anotado en colores/README.md.

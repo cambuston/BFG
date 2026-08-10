@@ -14,15 +14,11 @@
   <link rel="stylesheet" href="/calendar-form.css?v=1">
   <link rel="stylesheet" href="/calendar-colors.css?v=1">
   <link rel="stylesheet" href="/handle.css?v=1">
+  <link rel="stylesheet" href="/tema.css?v=1">
   <link rel="stylesheet" href="/mi.css?v=1">
 
-  <style>
-    :root {
-      --brand-blue: {{BRAND_COLOR}};
-      --primary: {{BRAND_COLOR}};
-      --secondary: {{BRAND_COLOR}};
-    }
-  </style>
+  <!-- El tema de la marca, incrustado por el servidor (src/brand.js). -->
+  <style>:root { {{BRAND_TEMA}} }</style>
   <script>
     window.BRAND = {{BRAND_JSON}};
     window.HANDLE = "{{HANDLE}}";

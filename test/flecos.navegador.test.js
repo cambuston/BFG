@@ -17,6 +17,8 @@ const { spawn } = require('node:child_process');
 const { test, before, after } = require('node:test');
 const assert = require('node:assert');
 const { chromium } = require('playwright');
+// Las mismas cuentas de fecha que usa la app. Ver abajo por qué importa.
+const { hoy, sumarDias } = require('../src/agenda');
 
 const RAIZ = path.join(__dirname, '..');
 const FOTOS = path.join(__dirname, 'screenshots');
@@ -343,9 +345,11 @@ test('8 · Regresos avisa de quien ya debería haber vuelto', async () => {
   const cli = db.prepare('INSERT INTO clientes (handle_id, nombre, telefono, creado) VALUES (?,?,?,?)')
     .run(pro.id, 'Carlos', '6867778899', Date.now()).lastInsertRowid;
 
-  const hace = new Date();
-  hace.setDate(hace.getDate() - 40);
-  const fecha = hace.toISOString().slice(0, 10);
+  // OJO: con `new Date().toISOString()` esta prueba fallaba por las tardes.
+  // toISOString() da la fecha en UTC, y la app trabaja en la hora del local
+  // (src/agenda.js). Pasadas las 5pm en México, UTC ya va un día adelante y
+  // los 40 días salían 39. Se usan las mismas cuentas que el código de verdad.
+  const fecha = sumarDias(hoy(), -40);
   db.prepare(`INSERT INTO citas (handle_id, cliente_id, servicio_id, servicio, precio,
               fecha, hora, minutos, estado, origen, creado)
               VALUES (?,?,NULL,'Corte',250,?, '10:00', 30, 'cumplida', 'profesional', ?)`)

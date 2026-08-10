@@ -9,11 +9,25 @@ Si eres otra sesión y te tocó trabajar aquí, esto es lo que hay que saber.
 
 ## La regla, una sola
 
-**El color vive en [`src/brand.js`](../src/brand.js) y en ningún otro lado.**
+**El look vive en [`src/brand.js`](../src/brand.js) y en ningún otro lado.**
+
+Una marca tiene un `color`, y puede tener además un `tema` con once piezas:
+fondo, tintaFondo, papel, superficie, tinta, acento, logo, texto, sombra,
+sombraAccion y herraje. Lo que no diga se deduce del `color` — por eso Flecos
+y Barbas siguen sin traer `tema` y se ven igual que siempre.
 
 ```js
 flecos: { color: '#2F6BFF', … }
 barbas: { color: '#0F766E', … }
+```
+
+Hay temas completos listos en [`temas.js`](temas.js): la maqueta de Luis
+(Flecos crema y salvia, Barbas negro, las dos con herraje de latón) y dos
+ideas para garras. **Aplicar uno es pegarlo en `src/brand.js`, y nada más.**
+
+```bash
+node colores/ver.js --tema flecosMaqueta
+node colores/ver.js --temas
 ```
 
 El servidor lo incrusta en el HTML como `:root { --brand-blue: … }` antes de
@@ -27,10 +41,15 @@ un color escrito a mano en algún CSS, eso es un bug, no una excepción.
 
 - El fondo azul plano.
 - **El marco del calendario entero** — las argollas, el papel y el cierre.
-  Esto es nuevo: hasta hace poco eran PNG con el azul horneado, y por eso
-  Barbas mostraba un halo azul alrededor de las argollas. Ver
-  [`public/marco.css`](../public/marco.css).
+  Hasta hace poco eran PNG con el azul horneado, y por eso Barbas mostraba un
+  halo azul. Ver [`public/marco.css`](../public/marco.css).
+- **El herraje**: `herraje: 'laton'` cambia las argollas de plata a latón.
+- **El logo**, el texto oscuro de los campos, y **las sombras** — incluida la
+  del botón principal, que llevaba su propio azul marino.
 - Botones, textos, la barra del navegador (`theme-color`).
+
+Esas últimas eran fugas y se taparon en
+[`public/tema.css`](../public/tema.css), que explica cada una.
 
 **No lo sigue** (son PNG con color horneado):
 
@@ -83,6 +102,14 @@ del color no sea sólo de gusto: si el color es claro, la letra no se lee.
 **4.5**, pero el cuerpo de la app va en **Inter 200**, que es muy delgada, así
 que quedarse en 4.5 se queda corto en la práctica. Apunta a 7 o más.
 
+### Lo que falta para un tema CLARO
+
+Un tema oscuro (la maqueta de Barbas, las ideas de garras) ya sale entero solo
+con datos. Un tema **claro** como el Flecos de la maqueta sale casi entero: lo
+que queda es el texto a media tinta que vive en las hojas copiadas de Días que
+Cuentan (`rgba(255,255,255,.72)` y compañía). En las hojas nuevas ya está
+puesto con `rgb(var(--tinta) / …)`, respetando la opacidad de cada uno.
+
 ### Lo que salió al medir los dos colores de hoy
 
 | Marca | Color | Contraste | |
@@ -118,7 +145,8 @@ sin perder el carácter (medido, no estimado):
 ## Qué hay aquí
 
 ```
-paleta.js    Los colores candidatos. Solo datos; nadie los importa desde la app.
+paleta.js    Colores sueltos candidatos. Solo datos; nadie los importa desde la app.
+temas.js     Temas COMPLETOS, listos para pegar en src/brand.js.
 ver.js       Genera las muestras y la hoja de contactos.
 muestras/    Salida. Se regenera sola y está en .gitignore.
 ```

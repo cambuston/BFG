@@ -72,13 +72,20 @@ test('el HTML sale con la marca ya puesta y sin plantillas sin rellenar', async 
   const f = await pide('GET', '/');
   assert.equal(f.status, 200);
   assert.ok(f.texto.includes('<title>Flecos</title>'));
-  assert.ok(f.texto.includes('--brand-blue: #2F6BFF'));
   assert.ok(f.texto.includes('flecos.mx/'));
   assert.ok(!f.texto.includes('{{'), 'quedó un {{PLACEHOLDER}} sin reemplazar');
 
+  // El tema entero, incrustado antes de que corra el JavaScript. Se comprueba
+  // sin espacios para no atarse a cómo se serializa.
+  const sinEspacios = (t) => t.replace(/\s+/g, '');
+  assert.ok(sinEspacios(f.texto).includes('--brand-blue:#2F6BFF'));
+  assert.ok(sinEspacios(f.texto).includes('--fondo:#2F6BFF'));
+  assert.ok(sinEspacios(f.texto).includes('--herraje:var(--herraje-plata)'));
+
   const b = await pide('GET', '/', { host: 'barbas.mx' });
   assert.ok(b.texto.includes('<title>Barbas</title>'));
-  assert.ok(b.texto.includes('--brand-blue: #0F766E'));
+  assert.ok(sinEspacios(b.texto).includes('--brand-blue:#0F766E'));
+  assert.ok(sinEspacios(b.texto).includes('--fondo:#0F766E'));
   assert.ok(!b.texto.includes('{{'));
 });
 
