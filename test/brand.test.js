@@ -10,8 +10,8 @@ const { brandFor, BRANDS } = require('../src/brand');
 
 const req = (host) => ({ headers: host ? { host } : {} });
 
-test('las dos marcas existen y no comparten nada que las confunda', () => {
-  assert.deepEqual(Object.keys(BRANDS).sort(), ['barbas', 'flecos']);
+test('las tres marcas existen y no comparten nada que las confunda', () => {
+  assert.deepEqual(Object.keys(BRANDS).sort(), ['barbas', 'flecos', 'garras']);
   assert.notEqual(BRANDS.flecos.color, BRANDS.barbas.color);
   assert.notEqual(BRANDS.flecos.domain, BRANDS.barbas.domain);
 });

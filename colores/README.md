@@ -57,24 +57,23 @@ Esas últimas eran fugas y se taparon en
   cualquier fondo oscuro, así que no estorba. Si un color candidato pelea con
   el dorado, es motivo para descartar el color — no para reexportar el arte.
 
-- **La palomita (`check.png`) es AZUL**, y ese azul no cambia nunca. Míralo en
-  la hoja de contactos: en Vino, Tabaco o Ciruela queda una palomita azul
-  celeste en una página vino, y canta.
+La palomita **ya no** es un PNG: se redibujó en CSS (`tema.css`) y sigue al
+acento de cada marca. Era el estorbo más gordo — en la hoja de familias salía
+una palomita azul celeste sobre páginas crema, negras y ciruela.
 
-  Es lo primero que hay que resolver si Flecos y Barbas dejan de ser azul y
-  verde. Tres salidas, de menos a más trabajo:
+## Las tres juntas
 
-  1. Quitarla (`.calendar-dialog::after { content: none }` desde `marco.css`).
-  2. Redibujarla en CSS, como ya se hizo con el marco del calendario
-     ([`public/marco.css`](../public/marco.css) explica cómo se midió el arte).
-  3. Reexportar el PNG en gris/blanco y teñirlo con `mask` + `background:
-     var(--brand-blue)`, que es el truco que ya usa `calendar-colors.css`.
+Para decidir el look de Flecos, Barbas y Garras **como familia** — que es como
+hay que decidirlo, porque lo que importa no es si un color gusta suelto sino si
+las tres se leen como hermanas:
 
-  La 2 es la que deja el proyecto donde debe estar.
+```bash
+node colores/ver-familias.js
+```
 
-  (Detalle aparte: en la pantalla del alta la palomita no se ve, sólo en la
-  página pública. Eso ya pasaba antes de todo esto y está anotado en el
-  [README principal](../README.md#pendiente-conocido).)
+Deja `colores/muestras-familias/index.html`: una fila por familia, las tres
+marcas en columnas, con los dos contrastes de cada una. Las familias están en
+[`familias.js`](familias.js).
 
 ## Probar un color
 
@@ -98,9 +97,24 @@ colores lado a lado** en el navegador. Esa carpeta está en `.gitignore`.
 La app es **texto blanco sobre el color de marca**. Eso hace que la elección
 del color no sea sólo de gusto: si el color es claro, la letra no se lee.
 
-`ver.js` calcula el contraste (WCAG) de blanco sobre cada color. AA pide
-**4.5**, pero el cuerpo de la app va en **Inter 200**, que es muy delgada, así
-que quedarse en 4.5 se queda corto en la práctica. Apunta a 7 o más.
+Y hay una SEGUNDA pregunta que se olvida fácil: **el `acento` hace de texto del
+botón principal, que va sobre blanco.** O sea que también tiene que ser oscuro.
+Es lo que descarta los colores bonitos:
+
+| | sobre blanco | |
+|---|---|---|
+| `#C9A227` oro de la maqueta | 2.42 | ilegible |
+| `#8A6D1F` oro apagado | 4.90 | sirve |
+| `#FF4D8D` rosa neón | 3.14 | ilegible |
+| `#C2185B` rosa profundo | 5.87 | sirve |
+
+Si algún día se quiere el oro brillante para adornos sobre fondo oscuro, hace
+falta un token aparte (`acentoClaro`): son dos usos con fondos opuestos y un
+solo color no puede con los dos.
+
+`ver.js` y `ver-familias.js` calculan las dos. AA pide **4.5**, pero el cuerpo
+de la app va en **Inter 200**, que es muy delgada, así que quedarse en 4.5 se
+queda corto. Apunta a 7 o más para el fondo.
 
 ### Lo que falta para un tema CLARO
 
@@ -145,8 +159,11 @@ sin perder el carácter (medido, no estimado):
 ## Qué hay aquí
 
 ```
-paleta.js    Colores sueltos candidatos. Solo datos; nadie los importa desde la app.
-temas.js     Temas COMPLETOS, listos para pegar en src/brand.js.
-ver.js       Genera las muestras y la hoja de contactos.
-muestras/    Salida. Se regenera sola y está en .gitignore.
+paleta.js         Colores sueltos candidatos. Solo datos; la app no los importa.
+temas.js          Temas completos de UNA marca, listos para pegar en src/brand.js.
+familias.js       Las TRES marcas a la vez: tres propuestas de familia.
+ver.js            Compara colores sueltos.
+ver-familias.js   Compara familias completas.  ← el de decidir
+muestras/         Salida de ver.js.            (.gitignore)
+muestras-familias/  Salida de ver-familias.js. (.gitignore)
 ```

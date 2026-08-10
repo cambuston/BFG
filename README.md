@@ -2,8 +2,8 @@
 
 Citas, regreso y memoria para peluqueros y barberos independientes.
 
-**Un solo código, dos apps.** `flecos.mx` y `barbas.mx` son el mismo programa
-con distinta marca. Lo único que cambia entre las dos vive en
+**Un solo código, tres apps.** `flecos.mx` (peluquería), `barbas.mx`
+(barbería) y `garras.mx` (uñas) son el mismo programa con distinta marca. Lo único que cambia entre las dos vive en
 [`src/brand.js`](src/brand.js): nombre, dominio y **tema**. Nada más.
 
 Una marca es un `color`, y opcionalmente un `tema` de once piezas (fondo,
@@ -30,6 +30,7 @@ cierre de abajo se dibujan con `border-radius` y degradados en
 npm install
 npm start          # Flecos en http://localhost:3100
 npm run barbas     # Barbas en http://localhost:3101
+npm run garras     # Garras en http://localhost:3102
 ```
 
 Con `BRAND` vacío, la marca se decide por el dominio de cada petición
@@ -37,7 +38,7 @@ Con `BRAND` vacío, la marca se decide por el dominio de cada petición
 
 | Variable | Default | Para qué |
 |---|---|---|
-| `BRAND` | *(por Host)* | `flecos` \| `barbas` |
+| `BRAND` | *(por Host)* | `flecos` \| `barbas` \| `garras` |
 | `PORT` | `3100` | Puerto |
 | `FYB_DB_PATH` | `./data/flecosybarbas.db` | Archivo SQLite |
 | `AUTH_MODE` | `demo` | `demo` \| `supabase` |
@@ -371,8 +372,13 @@ de 1 px (antialiasing). `marco.css` va al final y pisa a `calendar-colors.css`,
 así que **quitar su `<link>` devuelve el look de imágenes** sin tocar nada más
 — por eso los PNG viejos siguen en `public/`.
 
-## Pendiente conocido
+### La palomita, también en CSS
 
-En la pantalla del alta, la palomita decorativa de la esquina inferior derecha
-(`check.png`) no se ve; en la página pública sí. Viene de antes de todo esto y
-vive en las hojas copiadas de Días que Cuentan, que no se tocan.
+Igual que el marco: `check.png` era un disco AZUL con el color horneado, y ese
+azul no cambiaba nunca. En la hoja de familias cantaba en las tres marcas.
+Ahora se dibuja en CSS con el mismo método —se midió el PNG (388×388, disco
+exterior de radio 180, disco de color de radio 133) y se reconstruyó con un
+degradado radial, una máscara circular y un gancho de dos bordes girados.
+
+De paso arregló un fallo viejo: la palomita **no se veía en la pantalla del
+alta**, solo en la página pública. Ahora sale en las dos.

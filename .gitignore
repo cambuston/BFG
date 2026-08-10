@@ -19,3 +19,4 @@ test/screenshots/
 
 # Muestras de color: las regenera `node colores/ver.js`
 colores/muestras/
+colores/muestras-familias/

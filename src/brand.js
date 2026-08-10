@@ -1,11 +1,12 @@
-// UN SOLO CÓDIGO, DOS APPS.
+// UN SOLO CÓDIGO, TRES APPS.
 //
-// Flecos y Barbas son la misma aplicación con distinta marca. Todo lo que
+// Flecos (peluquería), Barbas (barbería) y Garras (uñas) son la misma
+// aplicación con distinta marca. Todo lo que
 // cambia entre las dos vive AQUÍ: nombre, dominio, color y textos de portada.
 // Ni una línea más del código sabe cuál de las dos está corriendo.
 //
 // Cómo se elige la marca, en orden:
-//   1. La variable de entorno BRAND (flecos | barbas)  ← producción y `npm run`
+//   1. BRAND (flecos | barbas | garras)                ← producción y `npm run`
 //   2. El Host de la petición (barbas.mx → barbas)     ← un solo server, dos dominios
 //   3. flecos (default)
 //
@@ -23,6 +24,15 @@ const BRANDS = {
     tagline: 'Que tus clientes regresen',
     // Pregunta del paso 1. Cambia por marca porque el oficio cambia.
     who: 'peluquería',
+  },
+  garras: {
+    id: 'garras',
+    name: 'Garras',
+    domain: 'garras.mx',
+    // PROVISIONAL: el look de las tres se está decidiendo en colores/.
+    color: '#4A2545',
+    tagline: 'Que tus clientes regresen',
+    who: 'estudio de uñas',
   },
   barbas: {
     id: 'barbas',

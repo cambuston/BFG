@@ -45,7 +45,7 @@ db.exec(`
 -- ---------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS handles (
   id           INTEGER PRIMARY KEY AUTOINCREMENT,
-  brand        TEXT NOT NULL,              -- 'flecos' | 'barbas'
+  brand        TEXT NOT NULL,              -- 'flecos' | 'barbas' | 'garras'
   handle       TEXT NOT NULL,              -- minúsculas, ya validado
   auth_provider TEXT NOT NULL,             -- google | apple | facebook | demo
   auth_sub     TEXT NOT NULL,              -- id del usuario en el proveedor

@@ -17,7 +17,7 @@ const RESERVED = new Set([
   'login', 'logout', 'signup', 'ayuda', 'soporte', 'contacto', 'acerca',
   'privacidad', 'terminos', 'aviso', 'blog', 'precios', 'static', 'public',
   'assets', 'img', 'css', 'js', 'fonts', 'fontawesome', 'favicon', 'robots',
-  'sitemap', 'manifest', 'flecos', 'barbas', 'flecosybarbas', 'null', 'undefined',
+  'sitemap', 'manifest', 'flecos', 'barbas', 'garras', 'flecosybarbas', 'null', 'undefined',
 ]);
 
 // "José Pérez" -> "jose-perez". Descompone (NFD) para poder borrar los

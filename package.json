@@ -1,7 +1,7 @@
 {
   "name": "flecosybarbas",
   "version": "0.1.0",
-  "description": "Flecos y Barbas — citas, regreso y memoria para peluqueros independientes. Un solo código, dos apps (flecos.mx / barbas.mx).",
+  "description": "Flecos y Barbas — citas, regreso y memoria para profesionales independientes. Un solo código, tres apps (flecos.mx / barbas.mx / garras.mx).",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -10,7 +10,8 @@
     "test": "node --test",
     "test:rapido": "node --test test/handles.test.js test/brand.test.js test/agenda.test.js test/alta.test.js test/citas.test.js",
     "test:navegador": "node --test test/navegador.test.js test/flecos.navegador.test.js",
-    "test:instalar": "playwright install chromium"
+    "test:instalar": "playwright install chromium",
+    "garras": "BRAND=garras PORT=3102 node server.js"
   },
   "engines": {
     "node": ">=18"

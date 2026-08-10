@@ -162,13 +162,135 @@ body { background: var(--fondo); }
    blanco. */
 .hora-btn:active { color: var(--acento); }
 
-/* LA FUGA QUE QUEDA VIVA — la palomita (check.png).
-   
-   Sigue siendo un PNG con el azul horneado, y en un tema vino o tabaco va a
-   cantar. NO se arregla aquí a propósito: teñirla con `mask` la dejaría de un
-   solo color plano y perdería el disco blanco y el volumen, o sea que
-   CAMBIARÍA cómo se ve hoy — justo lo que este paso promete no hacer.
-   
-   Se arregla redibujándola en CSS, como se hizo con el marco del calendario
-   (public/marco.css cuenta cómo se midió el arte). Es un trabajo aparte y va
-   anotado en colores/README.md.
+/* FUGA 5 — La palomita de la esquina.
+ *
+ * Era check.png: un disco AZUL con aro blanco, y ese azul no cambiaba nunca.
+ * En la hoja de familias se veía clarísimo — una palomita azul celeste sobre
+ * una página crema, negra o ciruela. Chillaba en las tres.
+ *
+ * Redibujada en CSS con el mismo método que el marco del calendario: se midió
+ * el PNG (388x388, disco exterior de radio 180, disco de color de radio 133,
+ * o sea un aro del 24% del radio) y se reconstruyó.
+ *
+ *   .palomita          el aro claro y el disco de color, en un radial-gradient
+ *   .palomita::after   el gancho, dos bordes de una caja girada -45°
+ *
+ * ESTO SÍ CAMBIA CÓMO SE VE, y a propósito: en Flecos el azul pasa del
+ * #1347FF horneado al de la marca, y en Barbas deja de ser azul.
+ */
+.calendar-dialog::after { content: none; }   /* fuera el PNG */
+
+.palomita {
+  position: absolute;
+  bottom: -16px;
+  right: -14px;
+  width: 28%;
+  aspect-ratio: 1 / 1;
+  z-index: 3;
+  pointer-events: none;
+
+  /* Contenedor propio: sin esto, el `cqw` del grosor del gancho se mediría
+     contra el calendario entero y el trazo salía tres veces más gordo. */
+  container-type: inline-size;
+
+  /* El aro, con su bisel: claro arriba-izquierda, sombreado abajo-derecha.
+     Es un degradado recto y la máscara de abajo lo recorta en círculo. */
+  background: linear-gradient(148deg, #FDFDFE 0%, #F2F0F5 46%, #D6D4DD 100%);
+
+  /* El disco exterior mide el 92.8% de la caja (180 de 194 en el PNG). */
+  -webkit-mask: radial-gradient(circle closest-side at 50% 50%, #000 0 92.8%, transparent 92.8%);
+          mask: radial-gradient(circle closest-side at 50% 50%, #000 0 92.8%, transparent 92.8%);
+
+  filter: drop-shadow(0 2px 7px rgb(var(--sombra) / 0.34));
+}
+
+/* El disco de color. 133 de radio sobre 194 de media caja = 68.6% del ancho,
+   o sea un margen del 15.7% por lado. */
+.palomita::before {
+  content: "";
+  position: absolute;
+  inset: 15.7%;
+  border-radius: 50%;
+  background: var(--acento);
+  /* Un pelo de sombra arriba: el aro proyecta sobre el disco hundido. */
+  box-shadow: inset 0 2cqw 3cqw rgb(0 0 0 / 0.18);
+}
+
+/* El gancho: una caja girada con solo dos bordes. Las medidas salen del PNG:
+   brazo largo 173, brazo corto 88, grosor 34, sobre 388 de ancho. */
+.palomita::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 45%;
+  width: 42%;
+  height: 21%;
+  border-left: 9.5cqw solid #fff;
+  border-bottom: 9.5cqw solid #fff;
+  /* Las puntas del PNG son redondeadas. */
+  border-radius: 0 0 0 3cqw;
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+/* FUGA 4 — El texto del hueco elegido, que se pintaba con --brand-blue (la
+   superficie) sobre blanco. Va con el acento, que es lo que se lee sobre
+   blanco. */
+.hora-btn:active { color: var(--acento); }
+
+/* FUGA 5 — La palomita de la esquina.
+ *
+ * Era check.png: un disco AZUL con aro blanco, y ese azul no cambiaba nunca.
+ * En la hoja de familias se veía clarísimo — una palomita azul celeste sobre
+ * una página crema, negra o ciruela. Chillaba en las tres.
+ *
+ * Redibujada en CSS con el mismo método que el marco del calendario: se midió
+ * el PNG (388x388, disco exterior de radio 180, disco de color de radio 133,
+ * o sea un aro del 24% del radio) y se reconstruyó.
+ *
+ *   .palomita          el aro claro y el disco de color, en un radial-gradient
+ *   .palomita::after   el gancho, dos bordes de una caja girada -45°
+ *
+ * ESTO SÍ CAMBIA CÓMO SE VE, y a propósito: en Flecos el azul pasa del
+ * #1347FF horneado al de la marca, y en Barbas deja de ser azul.
+ */
+.calendar-dialog::after { content: none; }   /* fuera el PNG */
+
+.palomita {
+  position: absolute;
+  bottom: -16px;
+  right: -14px;
+  width: 28%;
+  aspect-ratio: 1 / 1;
+  z-index: 3;
+  pointer-events: none;
+
+  /* Contenedor propio: sin esto, el `cqw` del grosor del gancho se mediría
+     contra el calendario entero y el trazo salía tres veces más gordo. */
+  container-type: inline-size;
+
+  /* De dentro afuera: disco de color, aro claro, y nada.
+     `closest-side` es lo que hace que el 100% sea el BORDE de la caja; por
+     omisión es farthest-corner y el aro se derramaba por las esquinas. */
+  background: radial-gradient(circle closest-side at 50% 50%,
+      var(--acento) 0 68.6%,
+      #EDEBF0 68.6% 92.8%,
+      transparent 92.8% 100%);
+  filter: drop-shadow(0 2px 7px rgb(var(--sombra) / 0.34));
+}
+
+/* El gancho: una caja girada con solo dos bordes. Las medidas salen del PNG:
+   brazo largo 173, brazo corto 88, grosor 34, sobre 388 de ancho. */
+.palomita::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: 44.6%;
+  height: 22.7%;
+  border-left: 8.8cqw solid #fff;
+  border-bottom: 8.8cqw solid #fff;
+  border-radius: 2px;
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+
