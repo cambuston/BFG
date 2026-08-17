@@ -89,15 +89,15 @@
 }
 
 /* Los botones de proveedor son .welcome-option (de Días que Cuentan); solo
-   se alinea el icono de marca a un ancho fijo para que los tres textos
-   empiecen en la misma columna. */
+   se alinea el icono de marca a un ancho fijo para que los textos empiecen
+   en la misma columna. */
 .welcome-option .fa-brands {
   width: 22px;
   text-align: center;
 }
 
-/* "Continuar con Facebook" es el más largo de los tres: un pelo más chico
-   para que los tres quepan en UNA línea y se lean como una misma lista. */
+/* Un pelo más chico para que cada botón quepa en UNA línea y los dos se lean
+   como una misma lista. */
 [data-step="2"] .welcome-option {
   font-size: 0.97rem;
   white-space: nowrap;
@@ -117,12 +117,231 @@
 .handle-back:active { color: rgb(var(--tinta)); }
 .handle-back i { margin-right: 5px; }
 
+/* ---------- Pasos 3 y 4: el horario y los servicios ----------
+   Van DENTRO del calendario, sobre el azul, así que no se parecen a los
+   mismos ajustes en /mi (que viven sobre una tarjeta blanca). Aquí la lengua
+   visual es la de la página pública: fichas translúcidas con borde claro,
+   como .servicio-btn y .hora-btn. */
+
+/* .handle-note nació como pie de la pantalla final. Aquí es una aclaración a
+   media pantalla, así que se despega de lo de arriba y de lo de abajo. */
+.calendar-dialog .alta-nota { margin: 16px 0 18px; }
+
+.alta-lista {
+  width: 100%;
+  margin-bottom: 14px;
+  text-align: left;
+}
+
+/* --- Los siete días, en fichas ---
+   Los siete siempre a la vista y repartiéndose el ancho a partes iguales: se
+   entiende de un vistazo cuáles se trabajan, en vez de adivinarlo por
+   ausencia. */
+.alta-dias {
+  display: flex;
+  gap: 5px;
+  width: 100%;
+  margin-bottom: 18px;
+}
+
+.dia-chip {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 46px;
+  padding: 10px 2px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.12);
+  color: rgb(var(--tinta) / 0.85);
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 400;
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.dia-chip:active { transform: scale(0.92); }
+
+/* El día que sí se trabaja: relleno macizo, como la hora escogida de la
+   página pública. Se distingue sin depender del color. */
+.dia-chip.is-on {
+  background: #fff;
+  border-color: #fff;
+  color: var(--brand-blue);
+  font-weight: 500;
+}
+
+/* Con `.calendar-dialog` delante porque si no gana `.calendar-dialog p` de
+   styles.css y el texto sale en azul oscuro sobre el azul del calendario. */
+.calendar-dialog .alta-sub {
+  margin: 0 0 8px;
+  color: rgb(var(--tinta) / 0.85);
+  font-size: 0.92rem;
+  font-weight: 300;
+  text-align: center;
+}
+
+.alta-franja {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  color: rgb(var(--tinta));
+}
+
+.alta-franja span { flex: 0 0 auto; font-size: 0.85rem; opacity: 0.7; }
+
+/* --- Los servicios --- */
+.alta-servicio {
+  padding: 10px 0;
+  color: rgb(var(--tinta));
+}
+
+.alta-servicio + .alta-servicio { border-top: 1px solid rgba(255, 255, 255, 0.16); }
+
+.s-linea {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+/* Precio y minutos con su unidad pegada ("$ 250", "30 min"): en esta tarjeta
+   no cabe una etiqueta encima de cada campo. */
+.s-campo {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 0 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.s-unidad {
+  flex: 0 0 auto;
+  font-size: 0.85rem;
+  font-weight: 300;
+  opacity: 0.75;
+}
+
+.s-quitar {
+  flex: 0 0 auto;
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgb(var(--tinta) / 0.8);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.15s ease;
+}
+.s-quitar:active { transform: scale(0.92); background: rgba(255, 255, 255, 0.2); }
+
+/* Los campos de estos dos pasos: nada de los cuadros blancos altos del paso 1.
+   Aquí son varios por renglón y tienen que caber. Se declaran juntos porque
+   Días que Cuentan solo viste input[type=text] y [date] — `time` y `number`
+   salían pelones del navegador. */
+.calendar-dialog .alta-lista input[type="text"],
+.calendar-dialog .alta-lista input[type="number"],
+.calendar-dialog .alta-franja input[type="time"] {
+  min-height: 46px;
+  margin: 0;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.14);
+  color: rgb(var(--tinta));
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 400;
+  box-shadow: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.calendar-dialog .alta-lista input:focus,
+.calendar-dialog .alta-franja input:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.26);
+}
+
+.calendar-dialog .alta-lista input::placeholder { color: rgb(var(--tinta) / 0.45); }
+
+.calendar-dialog .alta-lista input[type="text"] {
+  display: block;
+  width: 100%;
+  font-size: 1rem;
+}
+
+/* Dentro de .s-campo el cuadro es la caja de afuera; el campo va desnudo. */
+.calendar-dialog .s-campo input[type="number"] {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+  padding-left: 0;
+  padding-right: 0;
+  background: none;
+  border-radius: 0;
+}
+
+/* Las flechitas de los `number` no caben y no hacen falta: se teclea. */
+.calendar-dialog .alta-lista input[type="number"]::-webkit-outer-spin-button,
+.calendar-dialog .alta-lista input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.calendar-dialog .alta-lista input[type="number"] { -moz-appearance: textfield; }
+
+/* Los dos relojes de la franja. Se les quita el icono del selector, y no por
+   gusto: con él Chrome pide 137 px por campo y los dos más la «a» no caben en
+   los ~250 px que deja la tarjeta. Sin él bajan a 107 y sí caben. Se sigue
+   tecleando igual, que es como se pone una hora en un teléfono. */
+.calendar-dialog .alta-franja input[type="time"] {
+  flex: 1 1 0;
+  min-width: 0;
+  text-align: center;
+}
+
+.calendar-dialog .alta-franja input[type="time"]::-webkit-calendar-picker-indicator {
+  display: none;
+}
+
+/* Agregar servicio: presente sin competir con «Continuar». */
+.alta-agregar {
+  display: block;
+  width: 100%;
+  min-height: 46px;
+  margin: 0 0 14px;
+  padding: 11px 16px;
+  border: 1px dashed rgba(255, 255, 255, 0.38);
+  border-radius: 14px;
+  background: none;
+  color: rgb(var(--tinta) / 0.9);
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 300;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.alta-agregar:active { background: rgba(255, 255, 255, 0.14); }
+.alta-agregar i { margin-right: 7px; }
+
+.btn-primary.esperando { opacity: 0.55; cursor: default; }
+
 /* ---------- Listo ---------- */
 .calendar-dialog .share-box {
   background: rgba(255, 255, 255, 0.92);
   font-weight: 500;
   text-align: center;
 }
+
+/* El botón que cierra el alta y abre la app. Sin él, el alta terminaba en una
+   pantalla sin salida: la dirección era tuya y no había a dónde ir. */
+#done-ir { margin-top: 20px; }
 
 .calendar-dialog .handle-note {
   margin: 14px 0 0;
@@ -141,4 +360,60 @@
   font-weight: 300;
   color: rgb(var(--tinta) / 0.62);
   text-align: center;
+}
+
+/* ---------- Prueba de referencia decorada ----------
+   Se activa únicamente con `?decorated=1` y solo en la pantalla final. La
+   capa es arte transparente; texto, botones y comportamiento siguen en HTML. */
+.decoracion-floral { display: none; }
+
+body.is-decorated.is-complete .calendar-dialog {
+  margin-top: 4px;
+}
+
+body.is-decorated.is-complete .calendar-mid {
+  min-height: 390px;
+  padding-top: 68px;
+}
+
+body.is-decorated.is-complete .decoracion-floral {
+  display: block;
+  position: absolute;
+  inset: 1% -1% -2% -1%;
+  z-index: 4;
+  background: url('/decorations/flecos-floral-frame.png') center / 100% 100% no-repeat;
+  pointer-events: none;
+}
+
+body.is-decorated.is-complete .palomita {
+  z-index: 5;
+  width: 31%;
+  right: -16px;
+  bottom: -22px;
+}
+
+body.is-decorated.is-complete [data-step="5"] .big-emoji {
+  font-size: 2.45rem;
+  margin-bottom: 2px;
+}
+
+body.is-decorated.is-complete [data-step="5"] .step-prompt {
+  font-size: 1.55rem;
+  font-weight: 600;
+  margin-bottom: 26px;
+}
+
+body.is-decorated.is-complete [data-step="5"] .share-box {
+  position: relative;
+  z-index: 5;
+  padding: 20px 14px;
+  border-radius: 18px;
+  font-size: 1.08rem;
+}
+
+body.is-decorated.is-complete [data-step="5"] .handle-note {
+  position: relative;
+  z-index: 5;
+  margin-top: 28px;
+  font-size: 1rem;
 }

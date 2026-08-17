@@ -117,9 +117,52 @@ body { background: var(--fondo); }
 
    `--logo` y `--papel` son dos blancos DISTINTOS: el logo es blanco puro y el
    papel del calendario es #FAFAFC. Se intentó usar `--papel` para los dos y la
-   comparación pixel a pixel lo cazó. */
-.hero .logo .fondo { fill: var(--logo); }
-.hero .logo .trazo { stroke: var(--acento); }
+   comparación pixel a pixel lo cazó.
+
+   -------------------------------------------------------------------------
+   EL DIBUJO DE CADA MARCA
+   -------------------------------------------------------------------------
+   Hasta aquí las tres marcas se anunciaban con las MISMAS tijeras de
+   peluquería —un SVG provisional—, así que Barbas y Garras salían con el logo
+   de Flecos. Ahora cada una trae el suyo: un fleco, una barba, unas uñas.
+
+   El PNG no se pinta: se usa de MÁSCARA sobre `--acento`, igual que la
+   palomita de más abajo. El arte es trazo negro sobre transparente, y negro
+   fijo se perdería en un tema oscuro (el cuadro del logo es `--logo`, que en
+   Barbas es casi negro). De plantilla, el trazo lo pone el tema.
+
+   El tamaño no es a ojo. El arte viene de la capa de dibujo del juego de
+   iconos, donde el trazo ocupa el 43% del ancho del cuadro y el resto es el
+   margen que pide Android (medido, los tres iguales). Un 158% de máscara lo
+   deja en el ~68% del logo: un pelo más que las tijeras que había antes (55%),
+   porque estas son de línea fina y a 86 px se veían tímidas.
+
+   El ALTO sí cambia de una marca a otra, y es del dibujo: el de Garras es una
+   mano tumbada, más ancha que alta. Sale igual de ancho que los otros dos y
+   más bajo, que es lo correcto. */
+.hero .logo {
+  display: block;                 /* es un <span>: sin esto ignora el tamaño */
+  position: relative;
+  background: var(--logo);
+}
+
+.hero .logo::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--acento);
+
+  /* El respaldo del `var()` no es un adorno. Sin él, un servidor que no
+     incruste `--marca-icono` —uno viejo que se quedó corriendo, o una marca
+     nueva a medio poner— deja la máscara inválida, y entonces esto NO se
+     queda en blanco: pinta un CUADRO MACIZO del color del acento encima del
+     logo. Pasó. Con un degradado transparente de respaldo, lo peor que puede
+     salir es un cuadro vacío, que es un fallo que se entiende. */
+  -webkit-mask: var(--marca-icono, linear-gradient(transparent, transparent))
+                center / 158% no-repeat;
+          mask: var(--marca-icono, linear-gradient(transparent, transparent))
+                center / 158% no-repeat;
+}
 
 /* FUGA 2 — Las sombras. Eran un azul marino fijo (rgba(6,26,82,…)); sobre
    crema se veían azuladas.

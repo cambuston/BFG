@@ -1,0 +1,4 @@
+interface:
+  display_name: "Looks visuales de Flecos"
+  short_description: "Aplica estilos visuales temáticos a Flecos"
+  default_prompt: "Usa $flecos-visual-looks para aplicar uno de los looks de Flecos a esta interfaz sin alterar su funcionalidad."

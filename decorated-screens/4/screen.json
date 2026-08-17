@@ -1,0 +1,12 @@
+{
+  "number": 4,
+  "name": "barbas-complete-mexico",
+  "route": "/",
+  "state": "step-3-barbas-mexico",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "originalImageHash": "b3a8c40debbd1558113b591c38a3c9ab9460b9ee8854c5a153708cd69d75f375",
+  "decoratedImageHash": "4910d70afb2ebfb61ba44bd75badbbe9152af3c1676886a54bba57dcb204d37b"
+}

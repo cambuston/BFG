@@ -1,0 +1,35 @@
+preserved:
+  - id: public-structure
+    evidence: "Business identity, service prices, two actions, hours, rings, sparkle, and check remain."
+    target: body
+    kind: structural
+    confidence: high
+added:
+  - id: stone-background
+    evidence: "Reference uses the same dark slate stone behind the public card."
+    action: reuse the Barbas stone texture
+    target: body.is-decorated-barbas
+    kind: decorative
+    confidence: high
+modified:
+  - id: copper-calendar
+    evidence: "The public calendar frame and hardware become copper."
+    action: share decorated Barbas frame gradients
+    target: .calendar-dialog
+    kind: decorative
+    confidence: high
+  - id: warm-public-controls
+    evidence: "Service list and actions use cream ink over dark brown translucent surfaces."
+    action: share theme tokens and override public controls
+    target: .precios, .welcome-option
+    kind: theme
+    confidence: high
+removed: []
+moved_or_resized: []
+uncertain:
+  - id: business-content
+    evidence: "Reference shows Ana Ruiz while local data shows another business name."
+    action: preserve live business data; do not bake reference content into styling
+    target: .hero h1
+    kind: content
+    confidence: high

@@ -1,0 +1,47 @@
+preserved:
+  - id: alta-structure
+    evidence: "Logo, hero, rings, calendar, address form, sparkle, and confirmation check remain."
+    target: body
+    kind: structural
+    confidence: high
+added:
+  - id: stone-background
+    evidence: "Reference replaces the flat green background with dark slate stone."
+    action: add generated repeatable raster texture
+    target: body.is-decorated-barbas
+    kind: decorative
+    confidence: high
+  - id: leather-label
+    evidence: "Green leather badge overlaps the lower edge of the right reference panel."
+    action: add non-interactive CSS badge
+    target: .etiqueta-cuero
+    kind: decorative
+    confidence: high
+modified:
+  - id: copper-calendar
+    evidence: "White frame and silver rings become copper/bronze metal."
+    action: override paper and hardware gradients in decorated mode
+    target: .calendar-dialog
+    kind: decorative
+    confidence: high
+  - id: warm-surface-and-type
+    evidence: "Green surface becomes dark brown with warm cream typography and fields."
+    action: override inherited theme tokens and controls
+    target: body.is-decorated-barbas
+    kind: theme
+    confidence: high
+  - id: dark-copper-logo
+    evidence: "White logo tile becomes dark copper with a dark icon."
+    action: apply metallic CSS gradients
+    target: .hero .logo
+    kind: decorative
+    confidence: high
+removed: []
+moved_or_resized: []
+uncertain:
+  - id: leather-copy
+    evidence: "Reference badge contains placeholder-like English words."
+    action: use the real brand name Barbas instead of rasterizing placeholder text
+    target: .etiqueta-cuero
+    kind: content
+    confidence: high

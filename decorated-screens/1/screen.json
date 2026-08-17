@@ -1,0 +1,12 @@
+{
+  "number": 1,
+  "name": "handle-complete",
+  "route": "/",
+  "state": "step-3",
+  "viewport": {
+    "width": 430,
+    "height": 932
+  },
+  "originalImageHash": "813c8f006ea4576df11d4aac1eb102f9340bd74afeac7cd22c273584237a14fd",
+  "decoratedImageHash": "58b5c2d5e7f655855370886e42097d93b4124b1b830775fb42b10b5e0a1bcd50"
+}

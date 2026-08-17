@@ -1,0 +1,79 @@
+name: Fastlane CI
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  android:
+    name: Android Fastlane
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+
+      - name: Install dependencies
+        run: |
+          gem install bundler
+          bundle install
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+
+      - name: Setup Android SDK (minimal)
+        env:
+          ANDROID_HOME: ${{ runner.tool_cache }}/android-sdk
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget unzip
+          mkdir -p $ANDROID_HOME/cmdline-tools
+          wget -q https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O /tmp/cmdline.zip
+          unzip -q /tmp/cmdline.zip -d $ANDROID_HOME/cmdline-tools
+          yes | $ANDROID_HOME/cmdline-tools/cmdline-tools/bin/sdkmanager --sdk_root=$ANDROID_HOME "platform-tools" "platforms;android-33" "build-tools;33.0.2"
+          echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
+          echo "$ANDROID_HOME/platform-tools" >> $GITHUB_PATH
+
+      - name: Run fastlane android beta
+        env:
+          JSON_KEY_FILE: ${{ secrets.JSON_KEY_FILE }}
+          GRADLE_TASK: bundle
+        run: bundle exec fastlane android beta
+
+  ios:
+    name: iOS Fastlane
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+
+      - name: Install dependencies
+        run: |
+          gem install bundler
+          bundle install
+
+      - name: Setup provisioning and certs
+        run: |
+          echo "Add your provisioning/cert install steps here or use match/credentials stored in secrets."
+
+      - name: Run fastlane ios beta
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APP_IDENTIFIER: ${{ secrets.APP_IDENTIFIER }}
+          IOS_SCHEME: ${{ secrets.IOS_SCHEME }}
+        run: bundle exec fastlane ios beta
+
+# Notes:
+# - Add required secrets in the repository: JSON_KEY_FILE (Play service account JSON),
+#   APPLE_ID, APP_IDENTIFIER, IOS_SCHEME, and any certificate provisioning secrets.
+# - The Android SDK setup here is minimal; for production CI you may prefer a
+#   prebuilt runner image or a maintained action that installs SDK components.

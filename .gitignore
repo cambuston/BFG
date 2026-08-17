@@ -6,8 +6,11 @@ data/
 *.db-shm
 *.db-wal
 
-# Secretos
+# Secretos. `.env.*` cubre las copias (.env.bak, .env.antes-de-algo…), que
+# traen los mismos secretos y antes se colaban como archivos nuevos.
 .env
+.env.*
+!.env.example
 
 # Capturas que generan las pruebas de navegador (se rehacen con npm test)
 test/screenshots/

@@ -12,6 +12,17 @@ const TMP_DB = path.join(os.tmpdir(), `fyb-test-${process.pid}-${Date.now()}.db`
 process.env.FYB_DB_PATH = TMP_DB;
 process.env.AUTH_MODE = 'demo';
 delete process.env.BRAND;               // marca por Host, como en producción
+// Y que el .env de quien corre las pruebas no se meta: apunta a un archivo
+// que no existe (src/env.js lo lee al arrancar el servidor). Sin esto, un
+// BRAND=flecos en el .env de casa rompería la prueba de arriba.
+process.env.FYB_ENV_PATH = path.join(os.tmpdir(), 'fyb-sin-env-a-proposito');
+
+// Los archivos de verificación de Apple, en una carpeta de usar y tirar: solo
+// Flecos tiene el suyo, para poder probar las dos caras (el que está y el que
+// no) sin escribir dentro del repo.
+const TMP_APPLE = fs.mkdtempSync(path.join(os.tmpdir(), 'fyb-apple-'));
+fs.writeFileSync(path.join(TMP_APPLE, 'flecos.txt'), 'el de flecos');
+process.env.FYB_APPLE_DOMINIOS = TMP_APPLE;
 
 const { test, after } = require('node:test');
 const assert = require('node:assert');
@@ -25,6 +36,7 @@ after(() => {
   for (const f of [TMP_DB, `${TMP_DB}-wal`, `${TMP_DB}-shm`]) {
     try { fs.unlinkSync(f); } catch (e) { /* puede no existir */ }
   }
+  fs.rmSync(TMP_APPLE, { recursive: true, force: true });
 });
 
 // Petición cruda con node:http, no fetch: necesitamos poner el Host a mano
@@ -149,6 +161,21 @@ test('la misma cuenta entrando otra vez no duplica: la regresa a la suya', async
   assert.equal(otra.json.available, true, 'no debe haberse apartado la nueva');
 });
 
+// Con Supabase, una persona es UN id, entre haya entrado con Google o con
+// Apple: Supabase junta las cuentas que comparten correo verificado. Si aquí
+// se buscara por (proveedor, id), Juan entrando con Apple sería un
+// desconocido, se intentaría crear su identificador otra vez y la pantalla le
+// diría que "alguien tomó flecos.mx/juan" — su propia página.
+test('la misma persona entrando con otro botón sigue siendo ella', async () => {
+  const r = await pide('POST', '/api/handle/claim', {
+    body: { handle: 'juan', auth: { provider: 'apple', sub: 'u-juan' } },
+  });
+
+  assert.equal(r.status, 200, 'no debe ser 409: es la misma persona');
+  assert.equal(r.json.already, true);
+  assert.equal(r.json.handle, 'juan');
+});
+
 test('no se puede apartar una ruta de la app (400)', async () => {
   const r = await claim('registro', 'u-listo');
   assert.equal(r.status, 400);
@@ -205,4 +232,24 @@ test('la dirección apartada responde; una libre no', async () => {
 
   const libre = await pide('GET', '/todavia-de-nadie');
   assert.equal(libre.status, 404);
+});
+
+// --- el archivo con el que Apple comprueba el dominio ---
+//
+// Vale la pena probarlo aunque sea un archivo de texto: el camino empieza por
+// punto y Express NO sirve esos desde public/ (`dotfiles: 'ignore'`). Un 404
+// ahí se traduce en un «no pudimos verificar el dominio» en el portal de Apple
+// que no dice ni una palabra de por qué.
+
+const RUTA_APPLE = '/.well-known/apple-developer-domain-association.txt';
+
+test('el archivo de Apple se sirve, y es el de la marca que pregunta', async () => {
+  const r = await pide('GET', RUTA_APPLE);
+  assert.equal(r.status, 200);
+  assert.equal(r.texto, 'el de flecos');
+});
+
+test('una marca sin su archivo de Apple contesta 404 y no rompe nada', async () => {
+  const r = await pide('GET', RUTA_APPLE, { host: 'barbas.mx' });
+  assert.equal(r.status, 404);
 });

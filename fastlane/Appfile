@@ -1,0 +1,8 @@
+# Fastlane Appfile
+# Rellena estas variables por marca en el entorno o con un Appfile por marca.
+
+app_identifier("com.example.flecos") # Cambiar por cada marca: com.tuempresa.flecos
+apple_id("dev@example.com")         # Apple ID del account holder
+
+# Para Android, `supply` usará la variable `JSON_KEY_FILE` apuntando al
+# service account JSON de Play Console.

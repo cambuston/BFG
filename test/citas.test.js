@@ -11,6 +11,8 @@ process.env.FYB_DB_PATH = TMP_DB;
 process.env.AUTH_MODE = 'demo';
 process.env.FYB_SECRET = 'secreto-de-prueba';
 delete process.env.BRAND;
+// El .env de quien corre las pruebas no se mete: archivo que no existe.
+process.env.FYB_ENV_PATH = path.join(os.tmpdir(), 'fyb-sin-env-a-proposito');
 
 const { test, after } = require('node:test');
 const assert = require('node:assert');

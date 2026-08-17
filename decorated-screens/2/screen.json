@@ -1,0 +1,12 @@
+{
+  "number": 2,
+  "name": "barbas-handle-entry",
+  "route": "/",
+  "state": "step-1-barbas",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "originalImageHash": "a024a22a66155ebedab90d6ce01497c4a0648cee491a2f03b0b9570ccbc566f6",
+  "decoratedImageHash": "bb9a8065f70c3099b8e06b8bdc3a08dfa930284dcaccf24b5d59dbba7b9b4441"
+}

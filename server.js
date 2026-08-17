@@ -1,3 +1,8 @@
+// El .env, ANTES que nada. Los módulos de abajo leen process.env al cargarse
+// (la marca, el modo de cuenta, la ruta de la base), así que si esto no va
+// primero, leen un entorno a medias.
+require('./src/env').cargar();
+
 const path = require('path');
 const fs = require('fs');
 const express = require('express');
@@ -6,6 +11,7 @@ const { brandFor, BRANDS, ENV_BRAND, variablesCss } = require('./src/brand');
 const handlesRoutes = require('./src/handles.routes');
 const miRoutes = require('./src/mi.routes');
 const publicoRoutes = require('./src/publico.routes');
+const authRoutes = require('./src/auth.routes');
 const auth = require('./src/auth');
 const sesion = require('./src/sesion');
 
@@ -26,7 +32,7 @@ app.get('/api/config', (req, res) => {
   const brand = brandFor(req);
   res.json({
     brand,
-    auth: auth.publicConfig(),
+    auth: auth.publicConfig(brand.id),
     // Para que el navegador sepa si mandar a alguien al alta o a su agenda.
     sesion: req.pro ? { handle: req.pro.handle } : null,
   });
@@ -36,6 +42,11 @@ app.get('/api/config', (req, res) => {
 // quién es: en modo supabase esto llama a Supabase con el access_token.
 app.post('/api/handle/claim', auth.required);
 app.use('/api/handle', handlesRoutes);
+
+// El viaje a Google sin intermediario (AUTH_MODE=propio). Va ANTES de la ruta
+// de la página pública (/:handle) porque `auth` es un nombre de la app, no de
+// nadie: está apartado en src/handles.js.
+app.use('/auth', authRoutes);
 
 // Área del profesional: cookie firmada obligatoria en todas.
 app.use('/api/mi', sesion.exigir, miRoutes);
@@ -49,7 +60,7 @@ app.use('/api/p', publicoRoutes);
 // dominio). Así Barbas nunca parpadea en azul de Flecos antes de que corra el
 // JavaScript.
 //
-//   index.html    /            el alta (pasos 1 y 2)
+//   index.html    /            el alta (dirección, cuenta, horario, servicios)
 //   negocio.html  /juan        la página pública y reservar
 //   mi.html       /mi          Hoy · Clientes · Regresos · Mi negocio
 const PAGINAS = {
@@ -85,6 +96,33 @@ app.get('/', (req, res) => {
 
 // Archivos estáticos (css, fuentes, iconos, arte del calendario).
 // index:false para que '/' siempre pase por render() y reciba su marca.
+// Los iconos son POR MARCA, y van antes que los estáticos porque el nombre es
+// el mismo para las tres: /favicon.ico de barbas.mx tiene que dar la barba, no
+// el fleco. El arte de cada una vive en public/marca/<marca>/.
+const ICONOS = ['favicon.ico', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png'];
+app.get(ICONOS.map((f) => `/${f}`), (req, res) => {
+  const archivo = path.basename(req.path);
+  res.sendFile(path.join(PUBLIC_DIR, 'marca', brandFor(req).id, archivo));
+});
+
+// Apple no se cree que los dominios son tuyos: da un archivo de verificación
+// por Services ID y hay que servirlo en /.well-known/ de cada dominio de ese
+// Services ID. Es POR MARCA, como los iconos, porque cada marca tiene el suyo.
+//
+// Y NO se puede dejar en public/: express.static no sirve nada cuyo camino
+// empiece por punto (`dotfiles: 'ignore'`), así que un archivo en
+// public/.well-known/ contesta 404 sin decir por qué y Apple dice solo que no
+// pudo verificar. Por eso vive aparte y con ruta propia.
+// La carpeta se puede mover con FYB_APPLE_DOMINIOS; es lo que usan las pruebas
+// para no escribir dentro del repo.
+const DOMINIOS_APPLE = process.env.FYB_APPLE_DOMINIOS
+  || path.join(__dirname, 'identidad', 'dominios');
+app.get('/.well-known/apple-developer-domain-association.txt', (req, res, next) => {
+  const archivo = path.join(DOMINIOS_APPLE, `${brandFor(req).id}.txt`);
+  if (!fs.existsSync(archivo)) return next();   // esta marca aún no lo tiene
+  res.type('text/plain').send(fs.readFileSync(archivo, 'utf8'));
+});
+
 app.use(express.static(PUBLIC_DIR, { index: false }));
 
 // ---------- /mi — el área del profesional ----------

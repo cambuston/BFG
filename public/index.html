@@ -5,7 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>{{BRAND_NAME}}</title>
   <meta name="theme-color" content="{{BRAND_COLOR}}">
+  <!-- Los iconos los sirve el servidor según la marca (ver server.js). -->
   <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
   <!-- Mismas hojas que Días que Cuentan, en el mismo orden. El look sale de
        aquí; handle.css solo agrega las dos piezas nuevas (la caja del
@@ -19,6 +21,7 @@
   <link rel="stylesheet" href="/handle.css?v=1">
   <link rel="stylesheet" href="/marco.css?v=1">
   <link rel="stylesheet" href="/tema.css?v=1">
+  <link rel="stylesheet" href="/decorado.css?v=1">
 
   <!-- La marca la incrusta el servidor (src/brand.js). Va ANTES de las hojas
        que la usan para que Barbas nunca parpadee en el azul de Flecos. -->
@@ -32,18 +35,10 @@
   <div class="container">
 
     <div class="hero">
-      <!-- Logo provisional: tijeras en cuadro redondo, del color de la marca.
-           Cámbialo por el arte real cuando lo tengas (mismo tamaño). -->
-      <svg class="logo" viewBox="0 0 72 72" aria-hidden="true">
-        <rect class="fondo" width="72" height="72" rx="20" fill="#fff"/>
-        <g class="trazo" fill="none" stroke="var(--brand-blue)" stroke-width="4"
-           stroke-linecap="round" stroke-linejoin="round">
-          <path d="M24 20 L48 50"/>
-          <path d="M48 20 L24 50"/>
-          <circle cx="22" cy="54" r="6"/>
-          <circle cx="50" cy="54" r="6"/>
-        </g>
-      </svg>
+      <!-- El dibujo de la marca (un fleco, una barba, unas uñas). El PNG es
+           una plantilla: tema.css lo usa de máscara y el trazo lo pone
+           `--acento`, así que sigue al tema como todo lo demás. -->
+      <span class="logo" aria-hidden="true"></span>
       <h1>{{BRAND_NAME}}</h1>
       <p class="subtitle">{{BRAND_TAGLINE}}</p>
     </div>
@@ -89,23 +84,65 @@
               <button type="button" class="welcome-option" data-provider="apple">
                 <i class="fa-brands fa-apple"></i> <span>Continuar con Apple</span>
               </button>
-              <button type="button" class="welcome-option" data-provider="facebook">
-                <i class="fa-brands fa-facebook"></i> <span>Continuar con Facebook</span>
-              </button>
 
               <button type="button" class="handle-back" id="handle-back">
                 <i class="fa-light fa-chevron-left"></i> Cambiar mi dirección
               </button>
             </section>
 
-            <!-- ============ LISTO ============ -->
+            <!-- ============ PASO 3: el horario ============
+                 De aquí en adelante YA HAY SESIÓN: el alta quedó hecha y el
+                 negocio nació con horario y servicios de ejemplo. Estos dos
+                 pasos no llenan una pantalla en blanco, corrigen lo puesto —
+                 por eso se puede saltar y todo sigue funcionando. -->
             <section class="step" data-step="3" hidden>
+              <p class="step-prompt">¿Qué días trabajas?</p>
+
+              <!-- Días en fichas y UNA sola franja, no siete renglones con dos
+                   relojes cada uno: en 390 px de ancho eso no cabe (un
+                   input[type=time] pide 137 px él solo). El horario día por
+                   día vive en Mi negocio, que sí tiene sitio. -->
+              <div class="alta-dias" id="alta-dias"></div>
+
+              <p class="alta-sub">¿De qué hora a qué hora?</p>
+              <div class="alta-franja">
+                <input type="time" id="alta-abre" value="10:00" aria-label="Abre">
+                <span>a</span>
+                <input type="time" id="alta-cierra" value="19:00" aria-label="Cierra">
+              </div>
+
+              <p class="handle-note alta-nota">
+                Si algún día es distinto, lo ajustas después en Mi negocio.
+              </p>
+
+              <button type="button" class="btn-primary" id="horario-sigue">Continuar</button>
+              <button type="button" class="handle-back" id="horario-salta">Luego lo ajusto</button>
+            </section>
+
+            <!-- ============ PASO 4: los servicios ============ -->
+            <section class="step" data-step="4" hidden>
+              <p class="step-prompt">¿Qué haces, y a cómo?</p>
+              <p class="handle-note alta-nota">Los precios son de ejemplo. Pon los tuyos.</p>
+
+              <div class="alta-lista" id="alta-servicios"></div>
+
+              <button type="button" class="alta-agregar" id="alta-agregar">
+                <i class="fa-light fa-plus"></i> Agregar servicio
+              </button>
+
+              <button type="button" class="btn-primary" id="servicios-sigue">Continuar</button>
+              <button type="button" class="handle-back" id="servicios-salta">Luego lo ajusto</button>
+            </section>
+
+            <!-- ============ LISTO ============ -->
+            <section class="step" data-step="5" hidden>
               <p class="big-emoji">✂️</p>
               <p class="step-prompt" id="done-title">Ya es tuya</p>
               <div class="share-box" id="done-url"></div>
               <p class="handle-note">
-                Lo siguiente será tu horario, tus servicios y tus clientes.
+                Compártela: tus clientes reservan ahí, sin bajar nada ni crear cuenta.
               </p>
+              <button type="button" class="btn-primary" id="done-ir">Entrar a mi agenda</button>
             </section>
 
           </div>
@@ -119,6 +156,11 @@
       <!-- La palomita de la esquina, dibujada en CSS (ver tema.css). Antes era
            check.png, con el azul horneado. -->
       <span class="palomita" aria-hidden="true"></span>
+
+      <!-- Capa opcional para probar referencias decoradas. Es visual y no
+           participa en el flujo ni intercepta pulsaciones. -->
+      <span class="decoracion-floral" aria-hidden="true"></span>
+      <span class="etiqueta-cuero" aria-hidden="true">Barbas</span>
     </div>
 
   </div>

@@ -1,0 +1,22 @@
+preserved:
+  - Barbas como marca, dominio y contenido funcional en vivo
+  - estructura del calendario, argollas, destellos y botón de confirmación
+  - estado final y comportamiento responsive de la aplicación
+added:
+  - fondo futbolero mexicano genérico con cancha, balones y motivos de agave
+  - filigrana deportiva tenue dentro del calendario
+  - franjas tricolor en la parte superior e inferior del área verde
+modified:
+  - paleta del estado final a verde, blanco, rojo y dorado
+  - icono de Barbas a dorado para conservar contraste sobre verde oscuro
+  - argolla izquierda roja y argolla derecha verde
+  - hoja exterior blanca y superficie interior verde
+  - tarjeta del enlace blanca con borde rojo y texto verde
+  - círculo de confirmación verde con aro y palomita blancos
+removed: []
+moved_or_resized:
+  - contenido final centrado dentro de una superficie verde más alta
+  - confirmación superpuesta en la esquina inferior derecha del calendario
+uncertain:
+  - el escudo oficial de la referencia se interpreta como inspiración, no como activo a copiar
+  - se usa una insignia original de águila y balón, sin texto ni logotipos oficiales

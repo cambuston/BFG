@@ -1,18 +1,29 @@
-// Identidad social (Google / Apple / Facebook) vía Supabase.
+// Identidad social (Google / Apple).
 //
-// Dos modos, con la MISMA interfaz para el resto del código:
+// Tres modos, con la MISMA interfaz para el resto del código:
 //
-//   AUTH_MODE=demo      (default) No hay Supabase todavía. Los tres botones
+//   AUTH_MODE=demo      (default) No hay nada configurado. Los dos botones
 //                       funcionan y el alta se completa de verdad, con una
 //                       identidad de mentiras. Sirve para ver y probar el
 //                       flujo completo hoy, sin dar de alta nada en ningún
 //                       lado. NUNCA en producción.
 //
-//   AUTH_MODE=supabase  El navegador hace el login real con Supabase y manda
-//                       su access_token. Aquí se verifica contra Supabase
-//                       ANTES de creer nada de lo que diga el navegador.
+//   AUTH_MODE=propio    Hablamos con Google y con Apple directamente, sin
+//                       intermediario.
+//                       Cada marca enseña SU dominio, su nombre y su logo en
+//                       la pantalla del proveedor, y no hay mensualidad. El
+//                       viaje vive en src/auth.routes.js y src/oauth.js.
+//
+//   AUTH_MODE=supabase  Supabase hace de portero. El navegador vuelve con un
+//                       access_token y aquí se verifica contra Supabase ANTES
+//                       de creer nada. Funciona, pero la pantalla de Google
+//                       dice «Sign in to xxxx.supabase.co» —el dominio del
+//                       portero— y es la MISMA cara para las tres marcas.
 //
 // Cambiar de uno a otro no toca ni el HTML ni las rutas: solo el .env.
+
+const { BRANDS } = require('./brand');
+const oauth = require('./oauth');
 
 const MODE = (process.env.AUTH_MODE || 'demo').toLowerCase();
 const SUPABASE_URL = process.env.SUPABASE_URL || '';
@@ -22,17 +33,38 @@ if (MODE === 'supabase' && (!SUPABASE_URL || !SUPABASE_ANON_KEY)) {
   throw new Error('AUTH_MODE=supabase requiere SUPABASE_URL y SUPABASE_ANON_KEY (ver .env.example)');
 }
 
-const PROVIDERS = new Set(['google', 'apple', 'facebook']);
+// En modo propio, arrancar sin credenciales sería arrancar con los botones
+// rotos. Mejor no arrancar: un fallo al levantar se ve; una pantalla que no
+// entra, no.
+if (MODE === 'propio') {
+  const conAlgo = Object.keys(BRANDS).filter((b) => oauth.disponibles(b).length);
+  if (!conAlgo.length) {
+    throw new Error(
+      'AUTH_MODE=propio y ninguna marca tiene credenciales. Faltan GOOGLE_CLIENT_ID '
+      + 'y GOOGLE_CLIENT_SECRET (o los de cada marca: GOOGLE_CLIENT_ID_FLECOS…), '
+      + 'o el juego de Apple (APPLE_CLIENT_ID, APPLE_TEAM_ID, APPLE_KEY_ID y la '
+      + 'llave). La guía: identidad/README.md'
+    );
+  }
+}
 
-// Lo que el navegador necesita saber para poder autenticarse. La anon key de
-// Supabase es pública por diseño (va en el cliente); el secreto de verdad
-// nunca sale del servidor.
-function publicConfig() {
+const PROVIDERS = new Set(['google', 'apple']);
+
+// Lo que el navegador necesita saber para poder autenticarse. Nada de aquí es
+// secreto: la anon key de Supabase es pública por diseño y el client_id de
+// Google también. Los secretos no salen del servidor.
+//
+// `providers` es la lista de botones que SE PUEDEN enseñar. En modo propio
+// depende de la marca: si Barbas todavía no tiene credenciales de Apple, su
+// botón de Apple no se pinta en vez de fallar al tocarlo.
+function publicConfig(brandId) {
   return {
     mode: MODE,
     supabaseUrl: MODE === 'supabase' ? SUPABASE_URL : null,
     supabaseAnonKey: MODE === 'supabase' ? SUPABASE_ANON_KEY : null,
-    providers: ['google', 'apple', 'facebook'],
+    providers: MODE === 'propio'
+      ? oauth.disponibles(brandId)
+      : ['google', 'apple'],
   };
 }
 
@@ -58,6 +90,11 @@ async function verify(req) {
       name: typeof claimed.name === 'string' ? claimed.name.slice(0, 120) : null,
     };
   }
+
+  // En modo propio nadie se identifica por este POST: la identidad la trae el
+  // regreso de /auth/google/callback, que hace el alta él mismo (src/alta.js).
+  // Que este camino conteste 401 es lo correcto, no un olvido.
+  if (MODE === 'propio') return null;
 
   // --- modo supabase ---
   const header = req.get('authorization') || '';

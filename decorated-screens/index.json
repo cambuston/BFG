@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "nextNumber": 5,
+  "screens": [
+    {
+      "number": 1,
+      "name": "handle-complete",
+      "route": "/",
+      "state": "step-3"
+    },
+    {
+      "number": 2,
+      "name": "barbas-handle-entry",
+      "route": "/",
+      "state": "step-1-barbas"
+    },
+    {
+      "number": 3,
+      "name": "barbas-public-services",
+      "route": "/:handle",
+      "state": "public-services-barbas"
+    },
+    {
+      "number": 4,
+      "name": "barbas-complete-mexico",
+      "route": "/",
+      "state": "step-3-barbas-mexico"
+    }
+  ]
+}

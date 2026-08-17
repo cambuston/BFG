@@ -11,7 +11,10 @@
     "test:rapido": "node --test test/handles.test.js test/brand.test.js test/agenda.test.js test/alta.test.js test/citas.test.js",
     "test:navegador": "node --test test/navegador.test.js test/flecos.navegador.test.js",
     "test:instalar": "playwright install chromium",
-    "garras": "BRAND=garras PORT=3102 node server.js"
+    "garras": "BRAND=garras PORT=3102 node server.js",
+    "taller": "node colores/taller.js",
+    "supabase": "node supabase/comprueba.js",
+    "identidad": "node identidad/comprueba.js"
   },
   "engines": {
     "node": ">=18"

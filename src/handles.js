@@ -14,7 +14,7 @@ const MAX = 30;
 const RESERVED = new Set([
   'mi', 'registro', 'cita', 'citas', 'api', 'app', 'www', 'admin', 'root',
   'hoy', 'clientes', 'regresos', 'negocio', 'cuenta', 'entrar', 'salir',
-  'login', 'logout', 'signup', 'ayuda', 'soporte', 'contacto', 'acerca',
+  'login', 'logout', 'signup', 'auth', 'marca', 'ayuda', 'soporte', 'contacto', 'acerca',
   'privacidad', 'terminos', 'aviso', 'blog', 'precios', 'static', 'public',
   'assets', 'img', 'css', 'js', 'fonts', 'fontawesome', 'favicon', 'robots',
   'sitemap', 'manifest', 'flecos', 'barbas', 'garras', 'flecosybarbas', 'null', 'undefined',

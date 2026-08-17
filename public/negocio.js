@@ -7,6 +7,12 @@
 (function () {
   'use strict';
 
+  var decoratedMode = new URLSearchParams(window.location.search).get('decorated');
+  document.body.classList.toggle(
+    'is-decorated-barbas',
+    decoratedMode === 'barbas' && window.BRAND && window.BRAND.id === 'barbas'
+  );
+
   var HANDLE = window.HANDLE;
   var API = '/api/p/' + encodeURIComponent(HANDLE);
 

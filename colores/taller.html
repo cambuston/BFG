@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Taller de color · Flecos y Barbas</title>
+
+<!-- ===========================================================================
+     EL TALLER
+
+     Una pantalla, viva, para probar colores e ideas de CSS a mano.
+
+         node colores/taller.js        →  http://localhost:4321
+
+     Edita ESTE archivo con el editor, recarga el navegador, y ya. No hay
+     build, no hay JavaScript, no toca nada de la app: es la página pública de
+     un negocio de mentiras, con las MISMAS hojas de estilo que sirve el
+     servidor de verdad. Lo que se ve aquí es lo que se vería en flecos.mx/juan.
+
+     Hay tres bloques que editar, y están seguidos más abajo:
+
+       1. EL TEMA      los colores. Es lo mismo que va en `tema` en src/brand.js.
+       2. TEMAS LISTOS presets comentados: descomenta uno y pisa al de arriba.
+       3. TUS IDEAS    el cajón de sastre. Cualquier CSS suelto va aquí.
+
+     Cuando un tema te guste, se copia a `tema` dentro de la marca en
+     src/brand.js — ver colores/README.md. Eso es todo el trabajo.
+     ======================================================================== -->
+
+<!-- Las mismas hojas que negocio.html, en el mismo orden. No se tocan. -->
+<link rel="stylesheet" href="/fonts/fonts.css?v=1">
+<link rel="stylesheet" href="/fontawesome/css/all.min.css?v=2">
+<link rel="stylesheet" href="/styles.css?v=1">
+<link rel="stylesheet" href="/header-split.css?v=1">
+<link rel="stylesheet" href="/calendar-form.css?v=1">
+<link rel="stylesheet" href="/calendar-colors.css?v=1">
+<link rel="stylesheet" href="/handle.css?v=1">
+<link rel="stylesheet" href="/marco.css?v=1">
+<link rel="stylesheet" href="/tema.css?v=1">
+<link rel="stylesheet" href="/negocio.css?v=1">
+
+
+<!-- ===========================================================================
+     1 · EL TEMA  ← lo que se cambia el 90% de las veces
+     ===========================================================================
+     Estas son EXACTAMENTE las variables que el servidor incrusta en cada
+     página (src/brand.js → variablesCss). De aquí cuelga la app entera: si un
+     color aparece escrito a mano en una hoja de estilo, eso es un bug.
+
+     Los valores de abajo son los de Flecos hoy (todo deducido de #2F6BFF),
+     escritos uno por uno para que se puedan mover por separado.
+     ======================================================================== -->
+<style id="tema">
+:root {
+  /* -- Lo que se ve detrás de todo ------------------------------------- */
+  --fondo:        #2F6BFF;      /* la pantalla */
+  --tinta-fondo:  255 255 255;  /* el texto encima del fondo (TERNA RGB, sin alfa) */
+
+  /* -- El calendario ---------------------------------------------------- */
+  --papel:        #FAFAFC;      /* el marco: el blanco hueso de la carta */
+  --superficie:   #2F6BFF;      /* la página de dentro, donde vive el formulario */
+  --tinta:        255 255 255;  /* el texto encima de la superficie (TERNA RGB) */
+
+  /* Las argollas. Solo hay dos: var(--herraje-plata) o var(--herraje-laton).
+     Los degradados completos viven en public/tema.css. */
+  --herraje:      var(--herraje-plata);
+
+  /* -- Los acentos ------------------------------------------------------ */
+  /* --acento es la marca SOBRE BLANCO: el texto del botón principal, los
+     iconos, el foco de los campos, la palomita. Ojo: tiene que ser oscuro o
+     el botón no se lee. Es lo que descarta los colores bonitos. */
+  --acento:       #2F6BFF;
+  --logo:         #FFFFFF;      /* el cuadro del logo. Blanco PURO, no el papel */
+  --text:         #1B2A4A;      /* la tinta oscura: lo que se teclea en un campo */
+
+  /* -- Las sombras (TERNAS RGB: cada sombra le pone su propio alfa) ------ */
+  --sombra:         6 26 82;    /* cabecera, calendario, palomita */
+  --sombra-accion:  0 35 130;   /* la del botón principal, que es otra */
+
+  /* -- Nombres viejos ---------------------------------------------------
+     Las cuatro hojas copiadas de Días que Cuentan hablan en estos y no se
+     tocan. Siguen al tema solas; normalmente no hay que moverlas. */
+  --brand-blue: var(--superficie);
+  --primary:    var(--acento);
+  --secondary:  var(--acento);
+}
+</style>
+
+
+<!-- ===========================================================================
+     2 · TEMAS LISTOS
+     ===========================================================================
+     Son los de colores/temas.js. Descomenta UNO (quita el /* y el */ que lo
+     envuelven) y pisa al bloque de arriba, porque va después.
+     ======================================================================== -->
+<style id="presets">
+/* --- La maqueta de Luis: Flecos en crema y salvia, herraje de latón ------
+:root {
+  --fondo: #EFE9DC;  --tinta-fondo: 46 36 27;
+  --papel: #F7F2E7;  --superficie: #3F513C;  --tinta: 255 255 255;
+  --acento: #A9543A; --logo: #3F513C;        --text: #2E241B;
+  --sombra: 60 44 24; --sombra-accion: 60 44 24;
+  --herraje: var(--herraje-laton);
+}
+--- */
+
+/* --- Barbas en negro ----------------------------------------------------
+:root {
+  --fondo: #121212;  --tinta-fondo: 255 255 255;
+  --papel: #1E1E1E;  --superficie: #2A2A2A;  --tinta: 255 255 255;
+  --acento: #8A6D1F; --logo: #1E1E1E;        --text: #EDEDED;
+  --sombra: 0 0 0;   --sombra-accion: 0 0 0;
+  --herraje: var(--herraje-laton);
+}
+--- */
+
+/* --- Garras de noche: oscuro y saturado, para que brille la foto --------
+:root {
+  --fondo: #141019;  --tinta-fondo: 255 255 255;
+  --papel: #211A29;  --superficie: #2B2135;  --tinta: 255 255 255;
+  --acento: #C2185B; --logo: #211A29;        --text: #F3EEF7;
+  --sombra: 20 5 30; --sombra-accion: 20 5 30;
+  --herraje: var(--herraje-laton);
+}
+--- */
+</style>
+
+
+<!-- ===========================================================================
+     3 · TUS IDEAS
+     ===========================================================================
+     Aquí va cualquier CSS suelto que quieras probar y que no sea un color del
+     tema: radios, tipografía, espacios, bordes. Descomenta los ejemplos para
+     ver de qué tamaño son los cambios, o escribe los tuyos encima.
+
+     Lo que salga bien de aquí NO se queda en este archivo: se copia a
+     public/handle.css, public/negocio.css o public/mi.css. Las hojas
+     styles.css, header-split.css, calendar-form.css y calendar-colors.css son
+     copia literal de Días que Cuentan y no se tocan (ver CLAUDE.md).
+     ======================================================================== -->
+<style id="ideas">
+
+/* --- Esquinas menos redondas en los botones de la portada ---------------
+.welcome-option { border-radius: 10px; }
+------ */
+
+/* --- El nombre del negocio más apretado y con más peso ------------------
+.hero h1 { letter-spacing: 0.02em; font-weight: 500; }
+------ */
+
+/* --- Fichas de hora con más aire y borde marcado ------------------------
+.hora-btn {
+  padding: 12px 18px;
+  border-color: rgb(var(--tinta) / 0.55);
+  background: none;
+}
+------ */
+
+/* --- La lista de precios con puntitos de carta de restaurante ----------
+.precio-nombre::after {
+  content: " ...........................................................";
+  color: rgb(var(--tinta) / 0.35);
+  white-space: nowrap;
+}
+------ */
+
+</style>
+
+
+<!-- El único CSS que existe solo para el taller: la app es una pantalla fija
+     que no scrollea, y aquí queremos ver las tres tarjetas de un tirón. -->
+<style id="solo-del-taller">
+  body      { height: auto; overflow: auto; }
+  .container{ height: auto; overflow: visible; padding-bottom: 40px; }
+  /* Un respiro entre pantallas, que en la app nunca conviven. */
+  .calendar-dialog + .calendar-dialog { margin-top: 34px; }
+</style>
+</head>
+
+<body>
+<div class="container">
+
+  <!-- ===================== La cabecera ===================== -->
+  <div class="hero">
+    <svg class="logo" viewBox="0 0 72 72" aria-hidden="true">
+      <rect class="fondo" width="72" height="72" rx="20" fill="#fff"/>
+      <g class="trazo" fill="none" stroke="var(--brand-blue)" stroke-width="4"
+         stroke-linecap="round" stroke-linejoin="round">
+        <path d="M24 20 L48 50"/>
+        <path d="M48 20 L24 50"/>
+        <circle cx="22" cy="54" r="6"/>
+        <circle cx="50" cy="54" r="6"/>
+      </g>
+    </svg>
+    <h1>Peluquería Juan</h1>
+    <p class="subtitle">Insurgentes Sur 1234, Del Valle</p>
+  </div>
+
+
+  <!-- ===================== Pantalla 1 · la portada ===================== -->
+  <div class="card center calendar-dialog">
+    <div class="calendar-top" aria-hidden="true">
+      <span class="argolla"></span>
+      <span class="argolla"></span>
+    </div>
+
+    <div class="calendar-mid">
+      <div class="calendar-content">
+        <div class="steps">
+          <section class="step">
+            <p class="step-prompt">¿Qué necesitas?</p>
+
+            <ul class="precios">
+              <li class="precio-row">
+                <span class="precio-nombre">Corte de caballero</span>
+                <span class="precio-valor">$180</span>
+              </li>
+              <li class="precio-row">
+                <span class="precio-nombre">Corte y barba</span>
+                <span class="precio-valor">$260</span>
+              </li>
+              <li class="precio-row">
+                <span class="precio-nombre">Tinte</span>
+                <span class="precio-valor">$450</span>
+              </li>
+            </ul>
+
+            <button type="button" class="welcome-option">
+              <i class="fa-light fa-calendar-plus"></i> <span>Hacer cita</span>
+            </button>
+            <button type="button" class="welcome-option">
+              <i class="fa-light fa-rotate-left"></i> <span>Ya soy cliente</span>
+            </button>
+            <a class="welcome-option" href="#">
+              <i class="fa-brands fa-whatsapp"></i> <span>Escribir por WhatsApp</span>
+            </a>
+
+            <p class="handle-note">Hoy abierto de 10:00 a 19:00.</p>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <div class="calendar-bottom"></div>
+    <span class="palomita" aria-hidden="true"></span>
+  </div>
+
+
+  <!-- =============== Pantalla 2 · servicio, día y hora =============== -->
+  <div class="card center calendar-dialog">
+    <div class="calendar-top" aria-hidden="true">
+      <span class="argolla"></span>
+      <span class="argolla"></span>
+    </div>
+
+    <div class="calendar-mid">
+      <div class="calendar-content">
+        <div class="steps">
+          <section class="step">
+            <p class="step-prompt">¿Cuándo te viene bien?</p>
+            <p class="elegido">Corte y barba · 45 min · $260</p>
+
+            <button type="button" class="servicio-btn">
+              <span class="servicio-txt">
+                <span class="servicio-nombre">Corte de caballero</span>
+                <span class="servicio-min">30 minutos</span>
+              </span>
+              <span class="servicio-precio">$180</span>
+            </button>
+
+            <div class="dia">
+              <p class="dia-titulo">lunes 10 de agosto</p>
+              <div class="horas">
+                <button type="button" class="hora-btn">10:00</button>
+                <button type="button" class="hora-btn">10:45</button>
+                <button type="button" class="hora-btn">11:30</button>
+                <button type="button" class="hora-btn">13:00</button>
+              </div>
+              <button type="button" class="ver-mas">+ 6 horas más</button>
+            </div>
+
+            <button type="button" class="handle-back">
+              <i class="fa-light fa-chevron-left"></i> Otro servicio
+            </button>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <div class="calendar-bottom"></div>
+    <span class="palomita" aria-hidden="true"></span>
+  </div>
+
+
+  <!-- ========= Pantalla 3 · los datos y el botón principal ========= -->
+  <!-- Es la que enseña el --acento sobre blanco, que es la decisión difícil. -->
+  <div class="card center calendar-dialog">
+    <div class="calendar-top" aria-hidden="true">
+      <span class="argolla"></span>
+      <span class="argolla"></span>
+    </div>
+
+    <div class="calendar-mid">
+      <div class="calendar-content">
+        <div class="steps">
+          <section class="step" data-step="3">
+            <p class="step-prompt">¿Quién eres?</p>
+            <p class="elegido">lunes 10 de agosto, 11:30</p>
+
+            <input type="text" placeholder="Tu nombre" value="Luis Guzmán">
+            <input type="tel" placeholder="Tu celular" value="55 1234 5678">
+            <p class="handle-note">Tu celular es para avisarte si algo cambia.</p>
+
+            <button type="button" class="btn-primary">Confirmar mi cita</button>
+            <button type="button" class="handle-back">
+              <i class="fa-light fa-chevron-left"></i> Otra hora
+            </button>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <div class="calendar-bottom"></div>
+    <span class="palomita" aria-hidden="true"></span>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,322 @@
+/* Variantes decoradas opt-in. El diseño normal no entra en estas reglas. */
+
+.etiqueta-cuero { display: none; }
+
+body.is-decorated-barbas {
+  --fondo: #171b1d;
+  --tinta-fondo: 239 213 173;
+  --papel: #8a543d;
+  --superficie: #2b1a15;
+  --brand-blue: #2b1a15;
+  --tinta: 255 235 203;
+  --acento: #d59a68;
+  --primary: #d59a68;
+  --secondary: #d59a68;
+  --logo: #6b4938;
+  --text: #2a1811;
+  --sombra: 0 0 0;
+  --sombra-accion: 0 0 0;
+  --decor-icon-color: #e8a16f;
+  --decor-check-disc: #74432f;
+  --decor-check-ring-light: #fff0da;
+  --decor-check-ring-dark: #a96142;
+  --decor-check-mark: #fff8ec;
+  --decor-check-shadow: rgb(0 0 0 / 0.52);
+  background-color: #171b1d;
+  background-image:
+    linear-gradient(rgb(8 10 11 / 0.24), rgb(8 10 11 / 0.24)),
+    url('/decorations/barbas-piedra.png');
+  background-size: auto, 620px 620px;
+}
+
+body.is-decorated-barbas .hero .logo {
+  background:
+    radial-gradient(circle at 30% 20%, rgb(226 167 116 / 0.34), transparent 30%),
+    linear-gradient(145deg, #7d5540, #4b3027 58%, #2d1c18);
+  border: 1px solid rgb(225 157 103 / 0.42);
+  box-shadow:
+    inset 0 1px 1px rgb(255 220 180 / 0.25),
+    0 8px 18px rgb(0 0 0 / 0.55);
+}
+
+body.is-decorated-barbas .hero .logo::before {
+  background: var(--decor-icon-color, var(--acento));
+}
+body.is-decorated-barbas .hero h1 { color: #f0d2a5; }
+body.is-decorated-barbas .hero .subtitle { color: #f5ddbd; }
+
+body.is-decorated-barbas .calendar-top::before,
+body.is-decorated-barbas .calendar-bottom::before {
+  background:
+    linear-gradient(105deg,
+      #3a2119 0%, #6a3d2d 18%, #b66e4d 42%,
+      #6f402e 64%, #d08a61 82%, #45271f 100%);
+}
+
+body.is-decorated-barbas .calendar-mid::before {
+  background:
+    linear-gradient(to right,
+      #5a3327 0 4.44%,
+      #2b1914 4.44% 95.2%,
+      #70412f 95.2% 100%);
+}
+
+body.is-decorated-barbas .calendar-dialog {
+  filter:
+    drop-shadow(0 20px 28px rgb(0 0 0 / 0.58))
+    sepia(0.08);
+}
+
+body.is-decorated-barbas .argolla::before {
+  background: #171b1d;
+  box-shadow: inset 0 5px 10px rgb(0 0 0 / 0.78);
+}
+
+body.is-decorated-barbas .argolla::after {
+  background:
+    linear-gradient(to bottom,
+      transparent 62%, rgb(53 20 13 / 0.48) 84%, rgb(22 8 5 / 0.72) 100%),
+    linear-gradient(to right,
+      #442218 0%, #a85d41 12%, #e39a6c 38%, #8c4935 66%, #c87955 86%, #3a1b14 100%);
+  box-shadow: 2px 8px 12px rgb(0 0 0 / 0.66);
+}
+
+body.is-decorated-barbas .calendar-dialog::before {
+  filter: sepia(0.45) saturate(0.85) brightness(0.88);
+}
+
+body.is-decorated-barbas .handle-box,
+body.is-decorated-barbas .calendar-dialog input,
+body.is-decorated-barbas .calendar-dialog textarea,
+body.is-decorated-barbas .calendar-dialog .share-box {
+  background: #fff1dc;
+  color: #2a1811;
+  box-shadow:
+    inset 0 1px 2px rgb(91 47 31 / 0.22),
+    0 0 0 2px rgb(114 66 45 / 0.42);
+}
+
+body.is-decorated-barbas .handle-prefix,
+body.is-decorated-barbas .calendar-dialog input::placeholder {
+  color: rgb(73 43 31 / 0.66);
+}
+
+body.is-decorated-barbas .calendar-dialog .btn-primary {
+  background: #fff1dc;
+  color: #2d1911;
+  box-shadow: 0 10px 18px rgb(0 0 0 / 0.42);
+}
+
+body.is-decorated-barbas .welcome-option {
+  border-color: rgb(220 143 99 / 0.38);
+  background: linear-gradient(180deg, rgb(124 70 53 / 0.58), rgb(76 40 32 / 0.72));
+  color: #ffe7c4;
+  box-shadow: inset 0 1px 1px rgb(255 211 173 / 0.12);
+}
+
+body.is-decorated-barbas .precio-row + .precio-row {
+  border-color: rgb(220 143 99 / 0.24);
+}
+
+body.is-decorated-barbas .palomita {
+  background: linear-gradient(148deg,
+    var(--decor-check-ring-light, #fff) 0%,
+    var(--decor-check-ring-light, #fff) 46%,
+    var(--decor-check-ring-dark, #d6d4dd) 100%);
+  filter: drop-shadow(0 3px 8px var(--decor-check-shadow, rgb(0 0 0 / 0.34)));
+}
+
+body.is-decorated-barbas .palomita::before {
+  background: var(--decor-check-disc, var(--acento));
+}
+
+body.is-decorated-barbas .palomita::after {
+  border-left-color: var(--decor-check-mark, #fff);
+  border-bottom-color: var(--decor-check-mark, #fff);
+}
+
+body.is-decorated-barbas[data-screen-step="1"] .etiqueta-cuero {
+  display: block;
+  position: absolute;
+  left: 50%;
+  bottom: -35px;
+  z-index: 6;
+  min-width: 54%;
+  padding: 9px 18px 10px;
+  transform: translateX(-50%) rotate(-0.5deg);
+  border: 2px solid #173c2d;
+  border-radius: 10px;
+  background:
+    radial-gradient(circle at 30% 20%, rgb(255 255 255 / 0.12), transparent 28%),
+    linear-gradient(160deg, #245941, #123d2d 62%, #0b2c21);
+  color: #fff4dc;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-align: center;
+  box-shadow:
+    inset 0 0 0 2px rgb(94 145 105 / 0.22),
+    0 6px 12px rgb(0 0 0 / 0.58);
+  pointer-events: none;
+}
+
+/* ---------- Barbas · fútbol mexicano ----------
+   Referencia independiente, limitada al estado final del alta. */
+body.is-decorated-barbas-mexico.is-complete {
+  --fondo: #006847;
+  --tinta-fondo: 255 255 255;
+  --papel: #f7f5ed;
+  --superficie: #006b3c;
+  --brand-blue: #006b3c;
+  --tinta: 255 255 255;
+  --acento: #c8a24f;
+  --primary: #006847;
+  --secondary: #ce1126;
+  --logo: #006847;
+  --text: #174b35;
+  --sombra: 13 64 42;
+  --sombra-accion: 13 64 42;
+  --decor-icon-color: #d9b45d;
+  --decor-check-disc: #006847;
+  --decor-check-ring-light: #ffffff;
+  --decor-check-ring-dark: #e5e0d6;
+  --decor-check-mark: #ffffff;
+  --decor-check-shadow: rgb(25 42 28 / 0.48);
+  background: #006847 url('/decorations/barbas-mexico-fondo.png') center / cover no-repeat;
+}
+
+body.is-decorated-barbas-mexico.is-complete .hero .logo {
+  background: linear-gradient(145deg, #087b50, #005c3d);
+  border: 1px solid rgb(230 190 95 / 0.38);
+  box-shadow: 0 10px 20px rgb(0 65 42 / 0.34);
+}
+
+body.is-decorated-barbas-mexico.is-complete .hero .logo::before {
+  background: var(--decor-icon-color);
+}
+
+body.is-decorated-barbas-mexico.is-complete .hero h1,
+body.is-decorated-barbas-mexico.is-complete .hero .subtitle {
+  color: #fff;
+  text-shadow: 0 2px 6px rgb(0 64 42 / 0.48);
+}
+
+body.is-decorated-barbas-mexico.is-complete .calendar-dialog {
+  margin-top: 2px;
+  filter: drop-shadow(0 18px 26px rgb(13 64 42 / 0.36));
+}
+
+body.is-decorated-barbas-mexico.is-complete .calendar-mid {
+  min-height: 390px;
+  padding-top: 68px;
+}
+
+body.is-decorated-barbas-mexico.is-complete .calendar-top::before,
+body.is-decorated-barbas-mexico.is-complete .calendar-bottom::before {
+  background: #f7f5ed;
+}
+
+body.is-decorated-barbas-mexico.is-complete .calendar-mid::before {
+  background: linear-gradient(to right,
+    #f7f5ed 0 4.44%,
+    #006b3c 4.44% 95.2%,
+    #f7f5ed 95.2% 100%);
+  box-shadow:
+    inset 0 3px #ce1126,
+    inset 0 6px #f7f5ed,
+    inset 0 9px #006847,
+    inset 0 -3px #ce1126,
+    inset 0 -6px #f7f5ed,
+    inset 0 -9px #006847;
+}
+
+body.is-decorated-barbas-mexico.is-complete .calendar-mid::after {
+  content: "";
+  position: absolute;
+  left: 12.643%;
+  right: 9.621%;
+  top: 0;
+  bottom: 0;
+  z-index: 1;
+  background: url('/decorations/barbas-mexico-fondo.png') center 58% / 150% auto no-repeat;
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+body.is-decorated-barbas-mexico.is-complete .argolla:nth-of-type(1)::before {
+  background: #b91024;
+}
+
+body.is-decorated-barbas-mexico.is-complete .argolla:nth-of-type(2)::before {
+  background: #007a43;
+}
+
+body.is-decorated-barbas-mexico.is-complete .argolla:nth-of-type(1)::after {
+  background:
+    linear-gradient(to bottom, transparent 60%, rgb(86 0 12 / 0.48) 100%),
+    linear-gradient(to right, #710714, #ea2638 32%, #b90e22 68%, #65050f);
+}
+
+body.is-decorated-barbas-mexico.is-complete .argolla:nth-of-type(2)::after {
+  background:
+    linear-gradient(to bottom, transparent 60%, rgb(0 61 35 / 0.52) 100%),
+    linear-gradient(to right, #004a2b, #00a65c 32%, #007c45 68%, #003b23);
+}
+
+body.is-decorated-barbas-mexico.is-complete .calendar-dialog::before {
+  filter: sepia(0.5) saturate(1.15) hue-rotate(350deg);
+}
+
+body.is-decorated-barbas-mexico.is-complete [data-step="5"] .big-emoji {
+  font-size: 2.45rem;
+  margin-bottom: 0;
+  filter: sepia(1) saturate(2.6) hue-rotate(352deg) brightness(1.18);
+}
+
+body.is-decorated-barbas-mexico.is-complete [data-step="5"] .step-prompt {
+  margin-bottom: 22px;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+body.is-decorated-barbas-mexico.is-complete [data-step="5"] .share-box {
+  position: relative;
+  z-index: 3;
+  padding: 20px 14px;
+  border: 2px solid #ce1126;
+  border-radius: 18px;
+  background: rgb(255 255 255 / 0.92);
+  color: #006847;
+  font-size: 1.06rem;
+  box-shadow: 0 7px 16px rgb(0 64 42 / 0.24);
+}
+
+body.is-decorated-barbas-mexico.is-complete [data-step="5"] .handle-note {
+  position: relative;
+  z-index: 3;
+  margin-top: 26px;
+  color: #fff;
+  font-size: 1rem;
+  text-shadow: 0 1px 3px rgb(0 61 38 / 0.6);
+}
+
+body.is-decorated-barbas-mexico.is-complete .palomita {
+  z-index: 5;
+  width: 31%;
+  right: -16px;
+  bottom: -22px;
+  background: linear-gradient(148deg,
+    var(--decor-check-ring-light) 0%,
+    var(--decor-check-ring-light) 48%,
+    var(--decor-check-ring-dark) 100%);
+  filter: drop-shadow(0 4px 9px var(--decor-check-shadow));
+}
+
+body.is-decorated-barbas-mexico.is-complete .palomita::before {
+  background: var(--decor-check-disc);
+}
+
+body.is-decorated-barbas-mexico.is-complete .palomita::after {
+  border-left-color: var(--decor-check-mark);
+  border-bottom-color: var(--decor-check-mark);
+}

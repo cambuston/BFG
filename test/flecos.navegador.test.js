@@ -24,6 +24,25 @@ const RAIZ = path.join(__dirname, '..');
 const FOTOS = path.join(__dirname, 'screenshots');
 const TELEFONO = { viewport: { width: 390, height: 844 }, deviceScaleFactor: 2 };
 
+// La MISMA fila (.member-row, .mr-name, .mr-sub) se usa en tres pestañas: la
+// agenda de Hoy, Clientes y Regresos. Las tres viven en el HTML a la vez —las
+// que no tocan van `hidden`—, así que un `.member-row` a secas puede resolver
+// a la de otra pestaña, y Playwright se queda esperando algo invisible.
+//
+// Esto no era teórico: la prueba de la MEMORIA pasaba en domingo (cerrado: la
+// cita caía otro día y Hoy quedaba vacío) y fallaba en lunes (la cita caía
+// hoy, y Hoy estrenaba una fila oculta). Una prueba que depende del día de la
+// semana está rota la mitad del tiempo.
+const EN = {
+  hoy: '[data-vista="hoy"]',
+  clientes: '[data-vista="clientes"]',
+  regresos: '[data-vista="regresos"]',
+};
+
+// El servidor hereda este entorno y src/env.js lee un .env al arrancar: se
+// apunta a un archivo que no existe para que el .env de casa no se meta.
+process.env.FYB_ENV_PATH = path.join(os.tmpdir(), 'fyb-sin-env-a-proposito');
+
 const DBS = [];
 
 function puertoLibre() {
@@ -95,6 +114,10 @@ async function pestana() {
 }
 
 // Da de alta a un profesional y deja la pestaña con su sesión abierta.
+//
+// Los pasos 3 y 4 son ajustes sobre lo que el negocio YA trae puesto, así que
+// aquí se saltan: estas pruebas son de lo que pasa después, y quieren
+// justamente el horario y los servicios de ejemplo.
 async function daDeAlta(page, handle) {
   await page.goto(app.url);
   await page.fill('#handle', handle);
@@ -102,6 +125,9 @@ async function daDeAlta(page, handle) {
   await page.click('#handle-go');
   await page.click('[data-provider="google"]');
   await page.waitForSelector('[data-step="3"]:not([hidden])');
+  await page.click('#horario-salta');
+  await page.click('#servicios-salta');
+  await page.waitForSelector('[data-step="5"]:not([hidden])');
 }
 
 // El primer día con horas libres para ese servicio, ya en la pantalla del
@@ -199,7 +225,7 @@ test('4 · el círculo completo: Luis reserva y la cita aparece en la agenda de 
 
   let encontrada = false;
   for (let i = 0; i < 8 && !encontrada; i++) {
-    encontrada = await juan.page.$('.member-row') !== null;
+    encontrada = await juan.page.$(`${EN.hoy} .member-row`) !== null;
     if (!encontrada) {
       await juan.page.click('#dia-manana');
       await juan.page.waitForTimeout(250);
@@ -207,8 +233,8 @@ test('4 · el círculo completo: Luis reserva y la cita aparece en la agenda de 
   }
   assert.ok(encontrada, 'la cita de Luis debe aparecer en la agenda de Juan');
 
-  assert.match(await juan.page.textContent('.mr-name'), /Luis/);
-  assert.match(await juan.page.textContent('.mr-sub'), /Corte \+ barba/);
+  assert.match(await juan.page.textContent(`${EN.hoy} .mr-name`), /Luis/);
+  assert.match(await juan.page.textContent(`${EN.hoy} .mr-sub`), /Corte \+ barba/);
   await juan.page.screenshot({ path: path.join(FOTOS, 'f1-agenda.png') });
 
   assert.deepEqual(luis.errores, []);
@@ -228,8 +254,8 @@ test('5 · la MEMORIA: Juan escribe una nota y el cliente nunca la ve', async ()
 
   await juan.page.goto(`${app.url}/mi`);
   await juan.page.click('[data-ir="clientes"]');
-  await juan.page.waitForSelector('.member-row');
-  await juan.page.click('.member-row');
+  await juan.page.waitForSelector(`${EN.clientes} .member-row`);
+  await juan.page.click(`${EN.clientes} .member-row`);
   await juan.page.waitForSelector('.hoja-panel textarea');
 
   const SECRETO = 'Maquina 1 lados. No le gusta que le hablen.';
@@ -241,8 +267,8 @@ test('5 · la MEMORIA: Juan escribe una nota y el cliente nunca la ve', async ()
   // Se relee desde cero: que de verdad se haya guardado, no solo pintado.
   await juan.page.reload();
   await juan.page.click('[data-ir="clientes"]');
-  await juan.page.waitForSelector('.member-row');
-  await juan.page.click('.member-row');
+  await juan.page.waitForSelector(`${EN.clientes} .member-row`);
+  await juan.page.click(`${EN.clientes} .member-row`);
   await juan.page.waitForSelector('.hoja-panel textarea');
   assert.equal(await juan.page.inputValue('.hoja-panel textarea'), SECRETO);
 
@@ -364,12 +390,12 @@ test('8 · Regresos avisa de quien ya debería haber vuelto', async () => {
   assert.equal(await juan.page.textContent('#badge-regresos'), '1');
 
   await juan.page.click('[data-ir="regresos"]');
-  await juan.page.waitForSelector('.member-row');
-  assert.match(await juan.page.textContent('.mr-name'), /Carlos/);
-  assert.match(await juan.page.textContent('.mr-sub'), /Hace 40 días/);
+  await juan.page.waitForSelector(`${EN.regresos} .member-row`);
+  assert.match(await juan.page.textContent(`${EN.regresos} .mr-name`), /Carlos/);
+  assert.match(await juan.page.textContent(`${EN.regresos} .mr-sub`), /Hace 40 días/);
 
   // Y el botón que hace el trabajo: escribirle.
-  const wa = await juan.page.getAttribute('.wa-btn', 'href');
+  const wa = await juan.page.getAttribute(`${EN.regresos} .wa-btn`, 'href');
   assert.match(wa, /^https:\/\/wa\.me\/6867778899/);
 
   await juan.page.screenshot({ path: path.join(FOTOS, 'f1-regresos.png') });

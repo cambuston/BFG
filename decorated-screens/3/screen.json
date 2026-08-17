@@ -1,0 +1,12 @@
+{
+  "number": 3,
+  "name": "barbas-public-services",
+  "route": "/:handle",
+  "state": "public-services-barbas",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "originalImageHash": "39f93f79bec28591600914699cdb7f99ca27494b9d160e255bf3ed5e8e1991cf",
+  "decoratedImageHash": "ba359726f2620fb41a53af007d3ec8e6c31bcfa4b1f0bb1027c90c0d2e94af4c"
+}

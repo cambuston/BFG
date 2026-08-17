@@ -153,6 +153,15 @@ function variablesCss(marca) {
     // completo vive en tema.css y aquí solo se escoge cuál.
     '--herraje': `var(--herraje-${t.herraje})`,
 
+    // EL DIBUJO DE LA MARCA: un fleco, una barba, unas uñas pintadas.
+    //
+    // No es una imagen que se pinte tal cual, es una PLANTILLA: el PNG es
+    // trazo negro sobre transparente y tema.css lo usa de máscara sobre
+    // `--acento`, igual que la palomita. Así el logo sigue al tema —negro
+    // sobre crema, oro sobre negro— sin reexportar arte, y una marca nueva no
+    // puede salir con el logo de otra.
+    '--marca-icono': `url("/marca/${(marca && marca.id) || DEFAULT_BRAND}/icono.png")`,
+
     // --- Nombres viejos ---
     // Las cuatro hojas copiadas de Días que Cuentan hablan en estos, y no se
     // tocan (ver CLAUDE.md). Se mantienen apuntando al tema.

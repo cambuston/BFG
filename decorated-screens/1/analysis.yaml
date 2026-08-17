@@ -1,0 +1,80 @@
+preserved:
+  - id: hero-brand
+    evidence: "Logo, Flecos name, and tagline remain at the top."
+    target: .hero
+    kind: structural
+    confidence: high
+  - id: calendar-frame
+    evidence: "White paper frame, two rings, blue inner surface, and corner check remain."
+    target: .calendar-dialog
+    kind: structural
+    confidence: high
+added:
+  - id: floral-frame
+    evidence: "White flowers and olive branches decorate the top, both sides, and bottom edge."
+    action: add transparent non-interactive overlay layers
+    target: .calendar-dialog
+    kind: decorative
+    confidence: high
+  - id: interior-flower-scatter
+    evidence: "Small flowers surround the scissors above the completion heading."
+    action: add transparent non-interactive content decoration
+    target: '[data-step="3"]'
+    kind: decorative
+    confidence: high
+modified:
+  - id: hero-scale-and-spacing
+    evidence: "Decorated reference uses a larger logo and type with greater vertical spacing."
+    action: adjust only within the decorated variant
+    target: .hero
+    kind: layout
+    confidence: high
+  - id: calendar-proportions
+    evidence: "Decorated reference is taller and its inner content occupies a longer panel."
+    action: introduce decorated-variant sizing without changing the normal screen
+    target: .calendar-dialog
+    kind: layout
+    confidence: high
+  - id: completion-content
+    evidence: "Heading, URL card, and explanatory copy are larger and vertically redistributed."
+    action: restyle completion state within decorated variant
+    target: '[data-step="3"]'
+    kind: layout
+    confidence: high
+  - id: corner-spark
+    evidence: "Gold sparkle cluster remains but is larger and shifted around the upper-right frame."
+    action: replace or restyle existing spark decoration
+    target: .calendar-dialog::before
+    kind: decorative
+    confidence: high
+removed:
+  []
+moved_or_resized:
+  - id: corner-check
+    evidence: "The check remains at lower right but is larger and positioned lower in the reference."
+    target: .palomita
+    kind: decorative
+    confidence: high
+  - id: rings
+    evidence: "Both rings are larger relative to the calendar width."
+    target: .argolla
+    kind: decorative
+    confidence: medium
+uncertain:
+  - id: exact-background-treatment
+    evidence: "Reference appears to include soft radial lighting, but compression prevents exact separation from the base color."
+    target: body
+    kind: decorative
+    confidence: medium
+  - id: floral-asset-provenance
+    evidence: "The flattened reference does not contain independently recoverable transparent floral layers."
+    action: generate or reconstruct transparent assets and record their provenance
+    target: .calendar-dialog
+    kind: decorative
+    confidence: high
+  - id: exact-floral-composition
+    evidence: "The generated layer follows the reference's botanical language but is not a pixel-exact extraction from the flattened image."
+    action: retain as an intentional first-test approximation
+    target: .decoracion-floral
+    kind: decorative
+    confidence: high

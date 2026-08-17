@@ -75,6 +75,38 @@ Deja `colores/muestras-familias/index.html`: una fila por familia, las tres
 marcas en columnas, con los dos contrastes de cada una. Las familias están en
 [`familias.js`](familias.js).
 
+## Probar ideas en vivo, a mano
+
+`ver.js` y `ver-familias.js` sacan fotos: sirven para comparar y decidir, pero
+no para *tantear*. Para eso está el taller:
+
+```bash
+npm run taller          # → http://localhost:4321
+```
+
+Una sola pantalla con las tres vistas que importan (la portada, elegir hora, y
+los datos con el botón principal), servida con **las hojas de estilo de
+verdad** — no es una maqueta aparte, es lo que se ve en `flecos.mx/juan`. Se
+edita [`taller.html`](taller.html) con el editor y se recarga el navegador. No
+hay build ni JavaScript.
+
+El archivo tiene tres bloques seguidos, marcados con comentarios:
+
+1. **El tema** — las mismas variables que incrusta el servidor. Es lo que se
+   cambia casi siempre.
+2. **Temas listos** — los de `temas.js`, comentados. Se descomenta uno y pisa
+   al de arriba.
+3. **Tus ideas** — CSS suelto que no sea color: radios, tipografía, espacios.
+
+Lo que salga bien **no se queda ahí**: el tema se copia a `src/brand.js` y el
+CSS suelto a `handle.css`, `negocio.css` o `mi.css`.
+
+Hace falta el servidorcito ([`taller.js`](taller.js), veinte líneas de
+`express.static`) porque las hojas y las tipografías se piden por ruta
+absoluta; abriendo el HTML con doble clic el navegador bloquea las fuentes y la
+página se ve con la letra equivocada, que es justo lo que estorba al juzgar un
+color.
+
 ## Probar un color
 
 ```bash
@@ -164,6 +196,8 @@ temas.js          Temas completos de UNA marca, listos para pegar en src/brand.j
 familias.js       Las TRES marcas a la vez: tres propuestas de familia.
 ver.js            Compara colores sueltos.
 ver-familias.js   Compara familias completas.  ← el de decidir
+taller.html       Una pantalla viva para tantear a mano. ← el de probar
+taller.js         El servidorcito que la sirve (npm run taller).
 muestras/         Salida de ver.js.            (.gitignore)
 muestras-familias/  Salida de ver-familias.js. (.gitignore)
 ```

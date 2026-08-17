@@ -6,7 +6,9 @@
   <title>{{TITULO}}</title>
   <meta name="theme-color" content="{{BRAND_COLOR}}">
   <meta name="description" content="Haz tu cita con {{NEGOCIO}}.">
+  <!-- Los iconos los sirve el servidor según la marca (ver server.js). -->
   <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
   <!-- Mismas hojas que el alta, en el mismo orden. -->
   <link rel="stylesheet" href="/fonts/fonts.css?v=1">
@@ -19,6 +21,7 @@
   <link rel="stylesheet" href="/marco.css?v=1">
   <link rel="stylesheet" href="/tema.css?v=1">
   <link rel="stylesheet" href="/negocio.css?v=1">
+  <link rel="stylesheet" href="/decorado.css?v=1">
 
   <!-- El tema de la marca, incrustado por el servidor (src/brand.js). Va
        ANTES de que corra el JavaScript para que Barbas no parpadee en el azul
@@ -33,16 +36,10 @@
   <div class="container">
 
     <div class="hero">
-      <svg class="logo" viewBox="0 0 72 72" aria-hidden="true">
-        <rect class="fondo" width="72" height="72" rx="20" fill="#fff"/>
-        <g class="trazo" fill="none" stroke="var(--brand-blue)" stroke-width="4"
-           stroke-linecap="round" stroke-linejoin="round">
-          <path d="M24 20 L48 50"/>
-          <path d="M48 20 L24 50"/>
-          <circle cx="22" cy="54" r="6"/>
-          <circle cx="50" cy="54" r="6"/>
-        </g>
-      </svg>
+      <!-- El dibujo de la marca (un fleco, una barba, unas uñas). El PNG es
+           una plantilla: tema.css lo usa de máscara y el trazo lo pone
+           `--acento`, así que sigue al tema como todo lo demás. -->
+      <span class="logo" aria-hidden="true"></span>
       <h1>{{NEGOCIO}}</h1>
       <p class="subtitle" id="sub"></p>
     </div>

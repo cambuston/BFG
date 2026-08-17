@@ -111,4 +111,9 @@ function exigir(req, res, next) {
   next();
 }
 
-module.exports = { NOMBRE, crear, borrar, cargar, exigir, handleIdDe, DIAS };
+// `firmar` e `igualSeguro` salen para que el viaje al proveedor de identidad
+// (src/auth.routes.js) firme su cookie con el MISMO secreto. Un solo secreto
+// en el proyecto: si un día se rota, se rota una vez.
+module.exports = {
+  NOMBRE, crear, borrar, cargar, exigir, handleIdDe, DIAS, firmar, igualSeguro, leerCookies,
+};

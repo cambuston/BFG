@@ -1,0 +1,38 @@
+default_platform(:ios)
+
+platform :ios do
+  desc "Construir y subir a TestFlight (beta)"
+  lane :beta do
+    # Variables esperadas: IOS_SCHEME, APP_IDENTIFIER, APPLE_ID
+    scheme = ENV['IOS_SCHEME'] || 'App'
+    app_identifier = ENV['APP_IDENTIFIER'] || 'com.example.flecos'
+
+    increment_build_number(xcodeproj: Dir['*.xcodeproj'].first)
+    build_app(scheme: scheme)
+    upload_to_testflight(skip_waiting_for_build_processing: true)
+  end
+
+  desc "Construir y publicar en App Store (release)"
+  lane :release do
+    scheme = ENV['IOS_SCHEME'] || 'App'
+    build_app(scheme: scheme)
+    deliver(force: true)
+  end
+end
+
+platform :android do
+  desc "Construir AAB y subir a Play Store (internal)"
+  lane :beta do
+    # Variables esperadas: GRADLE_TASK (defaults to bundleRelease)
+    gradle(task: ENV['GRADLE_TASK'] || 'bundle', build_type: 'Release')
+    aab_path = Dir['**/app-release.aab'].first || 'app/build/outputs/bundle/release/app-release.aab'
+    supply(track: 'internal', apk: aab_path)
+  end
+
+  desc "Construir AAB y publicar en Play Store (production)"
+  lane :release do
+    gradle(task: ENV['GRADLE_TASK'] || 'bundle', build_type: 'Release')
+    aab_path = Dir['**/app-release.aab'].first || 'app/build/outputs/bundle/release/app-release.aab'
+    supply(track: 'production', apk: aab_path)
+  end
+end
