@@ -163,6 +163,35 @@ CREATE INDEX IF NOT EXISTS idx_citas_agenda  ON citas(handle_id, fecha, hora);
 CREATE INDEX IF NOT EXISTS idx_citas_cliente ON citas(cliente_id, fecha);
 
 -- ---------------------------------------------------------------------------
+-- Recordatorios  ·  qué ya se avisó
+-- ---------------------------------------------------------------------------
+-- Una fila por aviso mandado. NO guarda lo que hay que mandar — eso se calcula
+-- cada vez desde las citas — sino lo que YA se mandó, que es lo único que no se
+-- puede deducir mirando la agenda.
+--
+-- Va en tabla aparte y no como columna de citas porque los avisos de regreso
+-- no cuelgan de ninguna cita: cuelgan del cliente que no ha vuelto.
+CREATE TABLE IF NOT EXISTS recordatorios (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  handle_id  INTEGER NOT NULL REFERENCES handles(id) ON DELETE CASCADE,
+  cliente_id INTEGER NOT NULL REFERENCES clientes(id) ON DELETE CASCADE,
+  -- 'cita'    → "mañana a las 10"; cuelga de una cita concreta
+  -- 'regreso' → "hace mucho que no vienes"; cita_id va en NULL
+  tipo       TEXT NOT NULL,
+  cita_id    INTEGER REFERENCES citas(id) ON DELETE CASCADE,
+  fecha      TEXT NOT NULL,               -- 'YYYY-MM-DD', el día que se avisó
+  enviado    INTEGER NOT NULL
+);
+
+-- El candado contra el aviso doble: una cita se recuerda una sola vez, aunque
+-- se toque el botón dos veces o se abra la pantalla en dos teléfonos.
+CREATE UNIQUE INDEX IF NOT EXISTS idx_recordatorios_cita
+  ON recordatorios(cita_id) WHERE cita_id IS NOT NULL;
+
+CREATE INDEX IF NOT EXISTS idx_recordatorios_cliente
+  ON recordatorios(cliente_id, tipo, fecha);
+
+-- ---------------------------------------------------------------------------
 -- Ajustes internos (llave/valor). Hoy solo el secreto de las sesiones.
 -- ---------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS ajustes (

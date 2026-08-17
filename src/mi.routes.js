@@ -9,6 +9,7 @@ const express = require('express');
 const negocio = require('./negocio');
 const citas = require('./citas');
 const sesion = require('./sesion');
+const recordatorios = require('./recordatorios');
 const { brandFor } = require('./brand');
 const { hoy, fechaValida, sumarDias, fechaBonita, bonita, diaDeSemana } = require('./agenda');
 
@@ -163,6 +164,26 @@ router.post('/cerrar', (req, res) => {
 router.delete('/cerrar/:fecha', (req, res) => {
   negocio.abrirDia(id(req), req.params.fecha);
   res.json({ ok: true, cerrados: negocio.cerradosDesde(id(req), hoy()) });
+});
+
+// ---------------------------------------------------------------------------
+// Recordatorios — la cola de a quién hay que escribirle
+// ---------------------------------------------------------------------------
+router.get('/recordatorios', (req, res) => {
+  res.json(recordatorios.pendientes(id(req)));
+});
+
+// "Ya le escribí." Lo manda la pantalla al abrir WhatsApp, para que el mismo
+// aviso no vuelva a salir mañana.
+router.post('/recordatorios/marcar', (req, res) => {
+  const { tipo, cita_id, cliente_id } = req.body || {};
+  const r = recordatorios.marcar(id(req), {
+    tipo,
+    citaId: cita_id,
+    clienteId: cliente_id,
+  });
+  if (!r.ok) return res.status(r.error === 'no existe' ? 404 : 400).json(r);
+  res.json(r);
 });
 
 module.exports = router;

@@ -59,17 +59,22 @@ Aun en modo autónomo, sí hay que detenerse en dos casos:
 ## Lo que sigue
 
 **Flecos 1.0 está completo**: el alta, la página pública, reservar cita, «Hoy»,
-la ficha del cliente con sus notas, los regresos y «mi negocio». El README dice
-qué hace cada parte y qué quedó fuera a propósito.
+la ficha del cliente con sus notas, los recordatorios y «mi negocio». El README
+dice qué hace cada parte y qué quedó fuera a propósito.
+
+La pestaña **Recordar** (antes «Regresos») ya arma la cola del día —las citas de
+mañana y quien ya no viene—, escribe el mensaje y se acuerda de a quién ya se le
+escribió. **Lo que NO hace es mandarlo solo, y es a propósito**: el mensaje sale
+del WhatsApp personal de Juan, que es lo único que la gente contesta. El porqué
+largo está arriba de [src/recordatorios.js](src/recordatorios.js) y en el README;
+si alguien pide «que se manden solos», esa conversación es sobre WhatsApp
+Business API, plantillas de Meta y costo por mensaje, no sobre un cron.
 
 Lo que falta, en orden de lo que más se va a pedir:
 
-1. **Recordatorios automáticos.** Hoy Regresos enseña a quién le toca y da el
-   botón de WhatsApp, pero el mensaje lo manda Juan a mano. Es la promesa de
-   «Flecos hace que regresen» y todavía la cumple una persona.
-2. **Cancelar o mover una cita desde el lado del cliente.** El API ya cambia el
+1. **Cancelar o mover una cita desde el lado del cliente.** El API ya cambia el
    estado; falta la pantalla y avisarle al profesional.
-3. **Supabase de verdad.** El código está y probado contra un Supabase falso,
+2. **Supabase de verdad.** El código está y probado contra un Supabase falso,
    pero nadie ha configurado un proyecto real.
 
 El plan original está en [ideas.txt](ideas.txt) — esas son las notas de

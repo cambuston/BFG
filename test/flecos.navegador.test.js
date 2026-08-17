@@ -159,7 +159,7 @@ test('1 · el alta deja a Juan dentro de su agenda, no en una pantalla vacía', 
 
   // Las cuatro patas de ideas.txt, y en ese orden.
   const pestanas = await page.$$eval('.tab span:first-of-type', (n) => n.map((x) => x.textContent));
-  assert.deepEqual(pestanas, ['Hoy', 'Clientes', 'Regresos', 'Mi negocio']);
+  assert.deepEqual(pestanas, ['Hoy', 'Clientes', 'Recordar', 'Mi negocio']);
 
   await page.click('[data-ir="negocio"]');
   await page.waitForSelector('.servicio-fila');
@@ -360,7 +360,7 @@ test('7 · si le ganan la hora mientras llena sus datos, se le explica y sigue',
   await juan.ctx.close();
 });
 
-test('8 · Regresos avisa de quien ya debería haber vuelto', async () => {
+test('8 · Recordar avisa de quien ya debería haber vuelto, y no lo repite', async () => {
   const juan = await pestana();
   await daDeAlta(juan.page, 'regreso');
 
@@ -394,11 +394,62 @@ test('8 · Regresos avisa de quien ya debería haber vuelto', async () => {
   assert.match(await juan.page.textContent(`${EN.regresos} .mr-name`), /Carlos/);
   assert.match(await juan.page.textContent(`${EN.regresos} .mr-sub`), /Hace 40 días/);
 
-  // Y el botón que hace el trabajo: escribirle.
+  // Y el botón que hace el trabajo: escribirle, con el mensaje ya puesto.
   const wa = await juan.page.getAttribute(`${EN.regresos} .wa-btn`, 'href');
-  assert.match(wa, /^https:\/\/wa\.me\/6867778899/);
+  assert.match(wa, /^https:\/\/wa\.me\/6867778899\?text=/);
+  assert.match(decodeURIComponent(wa), /Carlos/);
+  assert.match(decodeURIComponent(wa), /30 días|40 días/);
 
   await juan.page.screenshot({ path: path.join(FOTOS, 'f1-regresos.png') });
+
+  // Al tocarlo se anota el aviso. La fila se queda (por si hay que insistir),
+  // pero apagada, y la pastilla baja: eso es lo que hace que no se repita.
+  await juan.page.click(`${EN.regresos} .wa-btn`);
+  await juan.page.waitForSelector(`${EN.regresos} .member-row.avisado`);
+  await juan.page.waitForSelector('#badge-regresos', { state: 'hidden' });
+
+  // Y sigue apagado después de recargar: quedó en la base, no en la pantalla.
+  await juan.page.goto(`${app.url}/mi`);
+  await juan.page.click('[data-ir="regresos"]');
+  await juan.page.waitForSelector(`${EN.regresos} .member-row.avisado`);
+  assert.equal(await juan.page.isVisible('#badge-regresos'), false,
+    'nada pendiente: ya se le escribió');
+
+  await juan.page.screenshot({ path: path.join(FOTOS, 'f1-recordatorio-avisado.png') });
+  assert.deepEqual(juan.errores, []);
+  await juan.ctx.close();
+});
+
+test('9 · la otra mitad de Recordar: las citas de mañana', async () => {
+  const juan = await pestana();
+  await daDeAlta(juan.page, 'manana');
+
+  const db = require('better-sqlite3')(DBS[DBS.length - 1]);
+  const pro = db.prepare("SELECT id FROM handles WHERE handle = 'manana'").get();
+  const cli = db.prepare('INSERT INTO clientes (handle_id, nombre, telefono, creado) VALUES (?,?,?,?)')
+    .run(pro.id, 'Lupita', '6861112233', Date.now()).lastInsertRowid;
+  // Directo a la base: mañana puede ser domingo y entonces no se puede reservar.
+  db.prepare(`INSERT INTO citas (handle_id, cliente_id, servicio_id, servicio, precio,
+              fecha, hora, minutos, estado, origen, creado)
+              VALUES (?,?,NULL,'Corte + barba',350,?, '16:30', 45, 'reservada', 'cliente', ?)`)
+    .run(pro.id, cli, sumarDias(hoy(), 1), Date.now());
+  db.close();
+
+  await juan.page.goto(`${app.url}/mi`);
+  await juan.page.click('[data-ir="regresos"]');
+  await juan.page.waitForSelector('#lista-manana .member-row');
+
+  assert.match(await juan.page.textContent('#lista-manana .mr-name'), /Lupita/);
+  assert.equal(await juan.page.textContent('#lista-manana .mr-date'), '4:30 pm',
+    'la hora como la dice la gente, no 16:30');
+
+  // El mensaje va escrito dentro de la liga: Juan solo le da enviar.
+  const wa = decodeURIComponent(await juan.page.getAttribute('#lista-manana .wa-btn', 'href'));
+  assert.match(wa, /Lupita/);
+  assert.match(wa, /mañana a las 4:30 pm/);
+  assert.match(wa, /Corte \+ barba/);
+
+  await juan.page.screenshot({ path: path.join(FOTOS, 'f1-recordatorio-manana.png') });
   assert.deepEqual(juan.errores, []);
   await juan.ctx.close();
 });

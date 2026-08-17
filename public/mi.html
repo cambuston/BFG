@@ -63,8 +63,14 @@
         <div id="lista-clientes"></div>
       </section>
 
-      <!-- ================= REGRESOS ================= -->
+      <!-- ================= RECORDATORIOS ================= -->
+      <!-- Dos colas en una pantalla: a quién le toca mañana y a quién ya se le
+           pasó el tiempo sin venir. Las dos se despachan igual, con un toque. -->
       <section class="vista" data-vista="regresos" hidden>
+        <p class="grupo-titulo" id="titulo-manana" hidden></p>
+        <div id="lista-manana"></div>
+
+        <p class="grupo-titulo">Ya no vienen</p>
         <p class="vista-nota" id="regresos-nota"></p>
         <div id="lista-regresos"></div>
       </section>
@@ -134,7 +140,7 @@
         <i class="fa-light fa-users"></i><span>Clientes</span>
       </button>
       <button type="button" class="tab" data-ir="regresos">
-        <i class="fa-light fa-rotate-left"></i><span>Regresos</span>
+        <i class="fa-light fa-rotate-left"></i><span>Recordar</span>
         <span class="pastilla" id="badge-regresos" hidden></span>
       </button>
       <button type="button" class="tab" data-ir="negocio">

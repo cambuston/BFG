@@ -126,6 +126,25 @@ body.con-hoja { overflow: hidden; }
 
 .wa-btn:active { transform: scale(0.94); }
 
+/* ---------- Recordatorios: las dos colas ---------- */
+.grupo-titulo {
+  margin: 22px 0 8px;
+  color: rgb(var(--tinta) / 0.85);
+  font-size: 0.9rem;
+  font-weight: 300;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.grupo-titulo:first-child { margin-top: 4px; }
+.grupo-titulo + .vista-nota { margin-top: 0; }
+
+/* Ya avisado: sigue visible (para poder escribirle otra vez si hace falta),
+   pero deja de pedir atención. Se apaga en vez de desaparecer porque una fila
+   que se esfuma al tocarla se siente como un error. */
+.member-row.avisado { opacity: 0.5; }
+.member-row.avisado .wa-btn { background: rgba(37, 211, 102, 0.45); }
+
 /* ---------- Buscador ---------- */
 .buscador {
   display: flex;

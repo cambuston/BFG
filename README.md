@@ -41,6 +41,11 @@ npm run garras     # Garras en http://localhost:3102
 Con `BRAND` vacío, la marca se decide por el dominio de cada petición
 (`barbas.mx` → Barbas), así que un solo proceso puede servir las dos.
 
+**Las tres marcas ya están en línea**, con HTTPS y las tres detrás del mismo
+proceso: `flecos.mx`, `barbas.mx` y `garras.mx`. Cómo se despliega, dónde vive
+el `.env` y dónde la llave de Apple **no se documenta aquí a propósito: este
+repositorio es público.** Fuera del árbol del código, los dos.
+
 | Variable | Default | Para qué |
 |---|---|---|
 | `BRAND` | *(por Host)* | `flecos` \| `barbas` \| `garras` |
@@ -85,7 +90,7 @@ Todo el producto cuelga de tres ideas, y cada una tiene su pantalla:
 | | Dónde vive | Qué hace |
 |---|---|---|
 | 📅 **Citas** | `/mi` → Hoy | La agenda del día, y reservar desde `flecos.mx/juan` |
-| 🔁 **Regreso** | `/mi` → Regresos | Quién ya se pasó de su tiempo sin venir |
+| 🔁 **Regreso** | `/mi` → Recordar | A quién hay que escribirle hoy, con el mensaje ya escrito |
 | 🧠 **Memoria** | `/mi` → Clientes | Cómo le gusta a cada quien, para que se sienta conocido |
 
 ## El mapa
@@ -102,7 +107,7 @@ flecos.mx
 └── /mi                   Área del profesional (pide sesión)
     ├── Hoy
     ├── Clientes          ← la ficha, con las notas y el historial
-    ├── Regresos
+    ├── Recordar          ← las citas de mañana y quien ya no viene
     └── Mi negocio        servicios, precios, duración, horario, días cerrados
 ```
 
@@ -219,6 +224,36 @@ estructurados nadie los llena.
 campo justo para que no se escape nada por un `...cliente` descuidado, y hay
 una prueba que lo vigila.
 
+### Recordar
+
+La pestaña que en vez de enseñar, pide. Dos colas en una pantalla:
+
+| | Quiénes | Qué dice el mensaje |
+|---|---|---|
+| **Mañana** | Las citas de mañana que siguen en pie | «te recuerdo tu cita de mañana a las 4:30 pm en Barbería Juan para Corte + barba. ¿Todo bien o la movemos?» |
+| **Ya no vienen** | Los de siempre: pasados sus días típicos y sin cita agendada | «hace 30 días que no te veo. ¿Te aparto lugar esta semana para tu corte + barba?» |
+
+Cada fila trae su botón: abre WhatsApp **con el mensaje ya escrito**, en el
+número de siempre del profesional. Al tocarlo la fila se apaga y la pastilla
+baja — eso queda en la base, así que el mismo aviso no vuelve a salir mañana.
+
+**Por qué el servidor no los manda solos.** No es un pendiente, es la decisión:
+
+1. Mandar de verdad exige WhatsApp Business API, plantillas aprobadas por Meta
+   y pagar por mensaje. Se sale de «un solo código, dos apps» y de que Juan
+   pueda usarlo el día que se registra.
+2. Un mensaje que sale del número personal de Juan lo contesta el cliente. Uno
+   que sale de un robot con número desconocido lo ignora. **El canal es el
+   número de siempre**, y eso no se automatiza sin perderlo.
+
+Así que lo automático es lo que de verdad se olvida: **acordarse de a quién hay
+que escribirle y qué decirle**. Enviar cuesta un dedo.
+
+Lo único que se guarda es lo ya avisado (tabla `recordatorios`). La cola no: se
+recalcula cada vez desde la agenda, porque una cita cancelada anoche no debe
+recordarse hoy. Y un aviso viejo, anterior a la última visita del cliente, no
+cuenta — si no, a un cliente fiel se le avisaría una sola vez en la vida.
+
 ---
 
 ## Las dos decisiones que explican el resto
@@ -299,9 +334,9 @@ Sale un `201` y cuatro `409`. Siempre.
 ### Automático
 
 ```bash
-npm test               # todo: 150 pruebas
-npm run test:rapido    # las 93 sin navegador (~0.5 s)
-npm run test:navegador # las 27 de navegador (~35 s)
+npm test               # todo: 160 pruebas
+npm run test:rapido    # las 102 sin navegador (~0.5 s)
+npm run test:navegador # las 28 de navegador (~40 s)
 ```
 
 Todo con `node --test`, lo que ya trae Node: **un solo corredor, sin
@@ -315,10 +350,11 @@ proceso con una base temporal que se borra sola — nunca toca `data/`.
 | [`test/agenda.test.js`](test/agenda.test.js) | 22 | Horas, fechas, empalmes y huecos libres |
 | [`test/alta.test.js`](test/alta.test.js) | 17 | El alta por HTTP, la carrera del identificador y el archivo de Apple |
 | [`test/citas.test.js`](test/citas.test.js) | 24 | Sesión, mi negocio, reservar, ficha, regresos, aislamiento entre negocios |
+| [`test/recordatorios.test.js`](test/recordatorios.test.js) | 9 | La cola de avisos, el mensaje, no repetir, y que nadie marque lo del vecino |
 | [`test/env.test.js`](test/env.test.js) | 12 | El lector del `.env`, y dónde lo busca |
 | [`test/oauth.test.js`](test/oauth.test.js) | 18 | Entrar con Google y con Apple: credenciales por marca, URL de salida y el JWT de Apple |
 | [`test/navegador.test.js`](test/navegador.test.js) | 19 | El alta entera en un navegador, en los tres modos |
-| [`test/flecos.navegador.test.js`](test/flecos.navegador.test.js) | 8 | El círculo completo: Juan se da de alta, Luis reserva, la cita aparece |
+| [`test/flecos.navegador.test.js`](test/flecos.navegador.test.js) | 9 | El círculo completo: Juan se da de alta, Luis reserva, la cita aparece, y se despachan los recordatorios |
 
 `agenda.test.js` es puro cálculo, sin servidor ni base: es donde se esconden
 los errores de «se me empalmaron dos citas», así que es la parte más probada.
@@ -374,6 +410,8 @@ comprobaron **rompiendo el código a propósito** y verificando que fallaran:
 | **Dejar de mandar los servicios que se editaron** | La 18 del navegador |
 | **Quitar el botón que entra a la agenda: el alta vuelve a ser callejón** | La 18 del navegador |
 | **Volver a preguntarle horario y servicios a quien ya tenía dirección** | La 19 del navegador |
+| **Buscar la cita sin el `handle_id` de la cookie en [`recordatorios.js`](src/recordatorios.js)** | *«no se puede marcar el aviso de otro negocio»* |
+| **Dar por avisado a cualquiera que alguna vez lo fue en [`recordatorios.js`](src/recordatorios.js)** | *«un aviso anterior a su última visita no cuenta»* |
 
 Ninguna es decorativa.
 
@@ -418,6 +456,8 @@ redirecciones: son para el navegador, no para nadie más.
 | `GET` | `/api/mi/cliente/:id` | La ficha completa |
 | `PUT` | `/api/mi/cliente/:id/notas` | La memoria |
 | `GET` | `/api/mi/regresos` | A quién le toca volver |
+| `GET` | `/api/mi/recordatorios` | La cola del día: mañana + quien no vuelve |
+| `POST` | `/api/mi/recordatorios/marcar` | «Ya le escribí» |
 | `GET/PUT` | `/api/mi/negocio` | Mis datos |
 | `POST/PUT/DELETE` | `/api/mi/servicio/:id?` | Servicios |
 | `PUT` | `/api/mi/horario` | El horario entero |
@@ -437,6 +477,7 @@ src/sesion.js             Cookie firmada, sin tabla ni librería
 src/agenda.js             Fechas, horas, empalmes, huecos  ← funciones puras
 src/negocio.js            Servicios, horario, días cerrados
 src/citas.js              Clientes, reservar, regresos
+src/recordatorios.js      La cola de avisos  ← y por qué no se mandan solos
 src/auth.js               demo | propio | supabase
 src/oauth.js              Entrar con Google sin intermediario (por marca)
 src/auth.routes.js        El viaje: /auth/google y su callback
@@ -465,8 +506,8 @@ ideas.txt                 Notas originales del producto
 
 ## Qué NO está construido
 
-- **Recordatorios automáticos.** Regresos enseña a quién le toca y da el botón
-  de WhatsApp, pero el mensaje lo manda Juan. No hay nada que escriba solo.
+- **Mandar el WhatsApp solo.** Recordar arma la cola y escribe el mensaje, pero
+  el toque de enviar lo da Juan. El porqué está arriba, y es a propósito.
 - **Foto del negocio.** Requiere subir archivos y dónde guardarlos.
 - **Cancelar o mover una cita desde el lado del cliente.** El API ya sabe
   cambiar el estado; falta la pantalla.
@@ -478,9 +519,9 @@ ideas.txt                 Notas originales del producto
   Services ID ni la llave `.p8` (pide la membresía de desarrollador, 99 USD al
   año, que ya se paga). Sin esas cuatro variables el botón simplemente no se
   pinta. La guía: [`identidad/`](identidad/README.md).
-- **Dominios de verdad.** Todo está probado en `localhost`; falta apuntar
-  `flecos.mx`, `barbas.mx` y `garras.mx` a un servidor y registrar esas
-  direcciones de regreso.
+- **Usuarios.** Está en línea y funciona de punta a punta, pero todavía no lo
+  usa ningún peluquero de verdad. Todo lo de esta lista es una apuesta hasta que
+  alguien lo use una semana.
 
 ## El marco, sin imágenes
 

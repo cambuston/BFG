@@ -1,8 +1,8 @@
 // El área del profesional. Cuatro pestañas y nada más:
 //
-//   Hoy       la agenda del día         → Citas
-//   Clientes  la ficha y las notas      → Memoria
-//   Regresos  a quién le toca volver    → Regreso
+//   Hoy         la agenda del día                  → Citas
+//   Clientes    la ficha y las notas               → Memoria
+//   Recordar    a quién hay que escribirle hoy     → Regreso
 //   Mi negocio  servicios y horario
 //
 // La ficha del cliente no es una pantalla aparte: es una hoja que sube desde
@@ -59,7 +59,7 @@
 
   // ---------- pestañas ----------
 
-  var TITULOS = { hoy: 'Hoy', clientes: 'Clientes', regresos: 'Regresos', negocio: 'Mi negocio' };
+  var TITULOS = { hoy: 'Hoy', clientes: 'Clientes', regresos: 'Recordatorios', negocio: 'Mi negocio' };
 
   function ir(nombre) {
     Array.prototype.forEach.call(document.querySelectorAll('.vista'), function (v) {
@@ -73,7 +73,7 @@
 
     if (nombre === 'hoy') cargarAgenda(fechaVista);
     if (nombre === 'clientes') cargarClientes($('buscar').value);
-    if (nombre === 'regresos') cargarRegresos();
+    if (nombre === 'regresos') cargarRecordatorios();
     if (nombre === 'negocio') cargarNegocio();
   }
 
@@ -166,50 +166,85 @@
       .catch(function () { aviso('No se pudieron cargar los clientes.'); });
   }
 
-  // ---------- REGRESOS ----------
+  // ---------- RECORDATORIOS ----------
+  //
+  // La pantalla no manda nada: prepara. Cada fila trae el mensaje ya escrito
+  // desde el servidor y el botón lo abre en WhatsApp, en el número de siempre
+  // del profesional. Al tocarlo se anota el aviso, y esa fila deja de pedir
+  // atención mañana. El porqué de no mandarlo solos está en src/recordatorios.js.
 
-  function cargarRegresos() {
-    api('GET', '/regresos')
+  function cargarRecordatorios() {
+    api('GET', '/recordatorios')
       .then(function (d) {
+        pintarBadge(d.pendientes);
+
+        // El título va siempre, aunque no haya nada: sin él, el "no tienes
+        // citas" queda huérfano arriba de la pantalla y no se sabe de qué habla.
+        var tituloManana = $('titulo-manana');
+        tituloManana.textContent = 'Mañana · ' + d.manana_bonita;
+        tituloManana.hidden = false;
+
+        pintarCola($('lista-manana'), d.citas, 'Mañana no tienes citas.');
+
         $('regresos-nota').textContent =
           'Sueles verlos cada ' + d.regreso_dias + ' días. Estos ya se pasaron.';
-
-        var caja = $('lista-regresos');
-        vaciar(caja);
-        pintarBadge(d.clientes.length);
-
-        if (!d.clientes.length) {
-          caja.appendChild(el('p', 'empty', 'Nadie pendiente. Todos al día.'));
-          return;
-        }
-        d.clientes.forEach(function (c) {
-          var fila = el('div', 'member-row editable');
-          fila.appendChild(el('div', 'mr-date', c.dias + 'd'));
-          var info = el('div', 'mr-info');
-          info.appendChild(el('div', 'mr-name', c.nombre));
-          info.appendChild(el('div', 'mr-sub',
-            'Hace ' + c.dias + ' días' + (c.habitual ? ' · ' + c.habitual : '')));
-          fila.appendChild(info);
-
-          // El botón de WhatsApp es el que hace el trabajo: recordar sin que
-          // sea otra tarea pendiente.
-          if (c.telefono) {
-            var wa = el('a', 'wa-btn');
-            wa.href = 'https://wa.me/' + c.telefono + '?text=' + encodeURIComponent(
-              'Hola ' + c.nombre + ', ¿te aparto lugar esta semana?');
-            wa.target = '_blank';
-            wa.rel = 'noopener';
-            wa.appendChild(el('i', 'fa-brands fa-whatsapp'));
-            wa.addEventListener('click', function (e) { e.stopPropagation(); });
-            fila.appendChild(wa);
-          }
-
-          fila.addEventListener('click', function () { abrirFicha(c.id); });
-          caja.appendChild(fila);
-        });
+        pintarCola($('lista-regresos'), d.regresos, 'Nadie pendiente. Todos al día.');
       })
-      .catch(function () { aviso('No se pudieron cargar los regresos.'); });
+      .catch(function () { aviso('No se pudieron cargar los recordatorios.'); });
   }
+
+  function pintarCola(caja, lista, vacio) {
+    vaciar(caja);
+    if (!lista.length) {
+      caja.appendChild(el('p', 'empty', vacio));
+      return;
+    }
+    lista.forEach(function (r) { caja.appendChild(filaRecordatorio(r)); });
+  }
+
+  function filaRecordatorio(r) {
+    var fila = el('div', 'member-row editable' + (r.avisado ? ' avisado' : ''));
+    fila.appendChild(el('div', 'mr-date', r.tipo === 'cita' ? r.hora_bonita : r.dias + 'd'));
+
+    var info = el('div', 'mr-info');
+    info.appendChild(el('div', 'mr-name', r.nombre));
+    info.appendChild(el('div', 'mr-sub', r.tipo === 'cita'
+      ? r.servicio
+      : 'Hace ' + r.dias + ' días' + (r.habitual ? ' · ' + r.habitual : '')));
+    fila.appendChild(info);
+
+    // Sin teléfono no hay a dónde escribir; la fila se queda como recordatorio
+    // para el propio Juan, que ya sabrá cómo localizarlo.
+    if (r.whatsapp) {
+      var wa = el('a', 'wa-btn');
+      wa.href = r.whatsapp;
+      wa.target = '_blank';
+      wa.rel = 'noopener';
+      wa.appendChild(el('i', 'fa-brands fa-whatsapp'));
+      wa.addEventListener('click', function (e) {
+        e.stopPropagation();
+        // Se marca al tocar, no al volver: nadie regresa a la app a confirmar
+        // que sí mandó el mensaje. Si se arrepiente, la fila se queda tachada
+        // y el botón sigue ahí para escribirle de todos modos.
+        fila.classList.add('avisado');
+        if (!r.avisado) {
+          r.avisado = true;
+          api('POST', '/recordatorios/marcar', {
+            tipo: r.tipo,
+            cita_id: r.cita_id,
+            cliente_id: r.cliente_id,
+          }).then(function () { pintarBadge(Math.max(0, badge() - 1)); })
+            .catch(function () { aviso('No se pudo anotar el aviso.'); });
+        }
+      });
+      fila.appendChild(wa);
+    }
+
+    fila.addEventListener('click', function () { abrirFicha(r.cliente_id); });
+    return fila;
+  }
+
+  function badge() { return Number($('badge-regresos').textContent) || 0; }
 
   function pintarBadge(n) {
     var b = $('badge-regresos');
@@ -627,8 +662,8 @@
   }).then(function (d) {
     negocio = d;
     ir('hoy');
-    // El aviso de Regresos se calcula al entrar, sin esperar a que abran
-    // la pestaña: es el recordatorio del día.
-    api('GET', '/regresos').then(function (r) { pintarBadge(r.clientes.length); });
+    // La pastilla se calcula al entrar, sin esperar a que abran la pestaña:
+    // es lo único de la app que pide algo en vez de solo enseñarlo.
+    api('GET', '/recordatorios').then(function (r) { pintarBadge(r.pendientes); });
   }).catch(function () { /* api() ya mandó al alta si no había sesión */ });
 })();

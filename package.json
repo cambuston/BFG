@@ -8,7 +8,7 @@
     "flecos": "BRAND=flecos node server.js",
     "barbas": "BRAND=barbas PORT=3101 node server.js",
     "test": "node --test",
-    "test:rapido": "node --test test/handles.test.js test/brand.test.js test/agenda.test.js test/alta.test.js test/citas.test.js",
+    "test:rapido": "node --test test/handles.test.js test/brand.test.js test/agenda.test.js test/alta.test.js test/citas.test.js test/recordatorios.test.js",
     "test:navegador": "node --test test/navegador.test.js test/flecos.navegador.test.js",
     "test:instalar": "playwright install chromium",
     "garras": "BRAND=garras PORT=3102 node server.js",
